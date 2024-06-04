@@ -35,8 +35,6 @@ export default function Home() {
           ref={canvasRef} width={500} height={250}  // サイズを大きくして確認
         />
         <textarea
-          className="flex shadow-md rounded mx-auto py-2 px-3 w-2/3 max-w-lg  focus:outline-none leading-9 border-gray-200"
-          placeholder="文字を入力" rows={5}
           onChange={handleInput}
         />
       </main>
