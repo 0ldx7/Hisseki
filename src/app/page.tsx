@@ -21,19 +21,28 @@ export default function Home() {
 
   // canvasに文字列を反映
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const formattedText = InputLineAdd(e.target.value); // 整形関数にvalueを渡す
-    setTextAreaValue(formattedText); // 整形結果がstateに渡されtextarea更新
-    const canvas = canvasRef.current; //getElementではなくrefでDOMを参照できる
-    if (canvas) {
+    const formattedText = InputLineAdd(e.target.value); // テキストを整形
+    setTextAreaValue(formattedText); // 状態を更新
+
+    const canvas = canvasRef.current; // Canvas要素を参照
+    if (canvas && canvas.getContext) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "24px Arial";
-        ctx.fillStyle = "black";
-        ctx.fillText(formattedText, 10, 125);
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
+        ctx.font = "16px Arial"; // フォントの設定
+        ctx.fillStyle = "black"; // 色設定
+
+        // 分割されたテキストを行ごとに描画
+        const lines = formattedText.split('\n');
+        let y = 20; // 開始のy座標
+        lines.forEach(line => {
+          ctx.fillText(line, 10, y); // テキストを描画
+          y += 20; // 次の行のy座標（行の高さに応じて調整）
+        });
       }
     }
-  };
+};
+
 
   return (
     <div className="p-4 bg-gray-200">
