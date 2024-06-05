@@ -2,7 +2,7 @@
 import React, { useRef, useState } from "react";
 
 export default function Home() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null); //初期値null指定で、指定した型の値で書き換えできる
   const [textAreaValue, setTextAreaValue] = useState<string>("");
 
   // 30字毎にテキストに改行を挟む
@@ -21,18 +21,16 @@ export default function Home() {
 
   // canvasに文字列を反映
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const formattedText = InputLineAdd(e.target.value);
-    // 整形関数にvalueを渡す
-    setTextAreaValue(formattedText);
-    // 整形結果がstateに渡されtextarea更新
-    const canvas = canvasRef.current;
+    const formattedText = InputLineAdd(e.target.value); // 整形関数にvalueを渡す
+    setTextAreaValue(formattedText); // 整形結果がstateに渡されtextarea更新
+    const canvas = canvasRef.current; //getElementではなくrefでDOMを参照できる
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.font = "24px Arial";
         ctx.fillStyle = "black";
-        ctx.fillText(formattedText, 10, 50);
+        ctx.fillText(formattedText, 10, 125);
       }
     }
   };
@@ -44,12 +42,13 @@ export default function Home() {
       <main>
         <canvas
           className="flex shadow-md rounded mx-auto border-gray-200 mb-4"
-          ref={canvasRef} width={500} height={250}
+          ref={canvasRef} //値をrefで管理
+          width={500} height={250}
         />
         <textarea
           className="shadow-md border border-gray-200"
           rows={5}
-          value={textAreaValue}
+          value={textAreaValue}// 値をstateで管理
           onChange={handleInput}
           style={{ width: '100%', resize: 'none' }}
         />
