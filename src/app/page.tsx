@@ -33,7 +33,7 @@ export default function Home() {
         ctx.fillStyle = "black"; // 色設定
 
         // 分割されたテキストを行ごとに描画
-        const lines = formattedText.split('\n');
+        const lines = formattedText.split('\n'); //文字列を改行文字部分で分割
         let y = 20; // 開始のy座標
         lines.forEach(line => {
           ctx.fillText(line, 10, y); // テキストを描画
