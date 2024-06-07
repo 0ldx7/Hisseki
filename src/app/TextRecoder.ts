@@ -1,3 +1,13 @@
+import DiffMatchPatch from 'diff-match-patch';
+
+const dmp = new DiffMatchPatch();
+const diff = dmp.diff_main('dogs bark', 'cats bark');
+
+// You can also use the following properties:
+DiffMatchPatch.DIFF_DELETE = -1;
+DiffMatchPatch.DIFF_INSERT = 1;
+DiffMatchPatch.DIFF_EQUAL = 0;
+
 // class TextEntry {
 //     constructor(timeStamp, diff, event = null) {
 //       this.timeStamp = timeStamp;
