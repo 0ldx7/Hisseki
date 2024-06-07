@@ -8,6 +8,10 @@ DiffMatchPatch.DIFF_DELETE = -1;
 DiffMatchPatch.DIFF_INSERT = 1;
 DiffMatchPatch.DIFF_EQUAL = 0;
 
+const text1 = "hello world";
+const text2 = "hello new world";
+const diffs = dmp.diff_main(text1, text2);
+
 // class TextEntry {
 //     constructor(timeStamp, diff, event = null) {
 //       this.timeStamp = timeStamp;

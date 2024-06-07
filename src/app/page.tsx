@@ -1,6 +1,11 @@
 "use client";
 import React, { useRef, useState } from "react";
 
+import DiffMatchPatch from 'diff-match-patch';
+
+  const dmp = new DiffMatchPatch();
+  const diff = dmp.diff_main('dogs bark', 'cats bark');
+
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null); //初期値null指定で、指定した型の値で書き換えできる
   const [textAreaValue, setTextAreaValue] = useState<string>("");
