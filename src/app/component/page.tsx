@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
-import { diff_match_patch } from 'diff-match-patch';
+import { diff_match_patch, patch_obj } from 'diff-match-patch';
 
 type InputRecord = {
-    delta: string;
+    diffs: patch_obj[];
     timestamp: number;
 };
 
@@ -16,7 +16,7 @@ const TextRecorder: React.FC = () => {
     const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        // Load records from local storage
+        // ローカルストレージから記録をロード
         const savedRecords = localStorage.getItem('textRecords');
         if (savedRecords) {
             setRecords(JSON.parse(savedRecords));
@@ -24,7 +24,7 @@ const TextRecorder: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        // Save records to local storage on update
+        // 記録が更新されるたびにローカルストレージに保存
         localStorage.setItem('textRecords', JSON.stringify(records));
     }, [records]);
 
@@ -34,21 +34,19 @@ const TextRecorder: React.FC = () => {
 
         const diffs = dmp.diff_main(lastText, newText);
         dmp.diff_cleanupSemantic(diffs);
-        const delta = dmp.diff_toDelta(diffs);
+        const patches = dmp.patch_make(lastText, newText, diffs);
 
-        if (delta !== '=0') {
-            setRecords(prevRecords => [
-                ...prevRecords,
-                { delta, timestamp: Date.now() }
-            ]);
-            setLastText(newText);
-        }
+        setRecords(prevRecords => [
+            ...prevRecords,
+            { diffs: patches, timestamp: Date.now() }
+        ]);
+        setLastText(newText);
     };
 
     const handlePlayback = () => {
         let currentIndex = 0;
         let currentText = '';
-        setText(''); // Clear the textarea before playback
+        setText('');
 
         if (playbackIntervalRef.current) {
             clearInterval(playbackIntervalRef.current);
@@ -62,13 +60,10 @@ const TextRecorder: React.FC = () => {
             }
 
             const record = records[currentIndex++];
-            console.log(encodeURIComponent(record.delta));
-            console.log(decodeURIComponent(record.delta));
-            const patches = dmp.patch_fromText(record.delta);
-            const [newText] = dmp.patch_apply(patches, currentText);
+            const [newText, _] = dmp.patch_apply(record.diffs, currentText);
             setText(newText);
             currentText = newText;
-        }, 1000);  // Adjust playback speed as needed
+        }, 1000); // Adjust playback speed as needed
     };
 
     return (
@@ -79,7 +74,7 @@ const TextRecorder: React.FC = () => {
                 <h4>Input Records</h4>
                 <ul>
                     {records.map((record, index) => (
-                        <li key={index}>{`${record.delta} (Timestamp: ${record.timestamp})`}</li>
+                        <li key={index}>{`Changes recorded at ${record.timestamp}`}</li>
                     ))}
                 </ul>
             </div>
