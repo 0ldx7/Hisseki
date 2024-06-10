@@ -14,6 +14,7 @@ const TextRecorder: React.FC = () => {
     const [text, setText] = useState<string>(''); // 現在のテキスト状態
     const [lastText, setLastText] = useState<string>(''); // 前回のテキスト状態
     const [records, setRecords] = useState<InputRecord[]>([]); // 変更記録の配列
+    const [darkMode, setDarkMode] = useState(false); // ダークモードの状態
     const dmp = new diff_match_patch(); // diff-match-patchライブラリのインスタンス
 
     useEffect(() => {
@@ -73,14 +74,29 @@ const TextRecorder: React.FC = () => {
     };
 
     return (
-        <div>
-            <textarea value={text} onChange={handleInputChange} />
-            <button onClick={handlePlayback}>Playback</button>
+        <div className={`p-6 max-w-lg mx-auto ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} rounded-xl shadow-md space-y-4`}>
+            <textarea
+                className="w-full h-48 p-2 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded"
+                value={text}
+                onChange={handleInputChange}
+            />
+            <button
+                className="w-full py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                onClick={handlePlayback}
+            >
+                Playback
+            </button>
+            <button
+                className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => setDarkMode(!darkMode)}
+            >
+                Toggle Dark Mode
+            </button>
             <div>
-                <h4>Input Records</h4>
-                <ul>
+                <h4 className="text-lg font-semibold">Input Records</h4>
+                <ul className="list-disc space-y-2">
                     {records.map((record, index) => (
-                        <li key={index}>{`Changes recorded at ${record.timestamp}`}</li>
+                        <li key={index} className="text-sm">{`Changes recorded at ${record.timestamp}`}</li>
                     ))}
                 </ul>
             </div>
