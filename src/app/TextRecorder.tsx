@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation'; // 正しいフックのインポート
-import Link from 'next/link';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
 
 type InputRecord = {
@@ -51,9 +50,10 @@ const TextRecorder: React.FC = () => {
     };
 
     const goToPlaybackScreen = () => {
-        const url = `/Playback?text=${encodeURIComponent(text)}`;
+        const url = `/playback?text=${encodeURIComponent(text)}`;
         router.push(url);
     };
+    
 
     return (
         <div className={`p-6 max-w-lg mx-auto ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} rounded-xl shadow-md space-y-4`}>

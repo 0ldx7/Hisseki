@@ -1,6 +1,8 @@
+"use client";
+
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 
 const PlaybackScreen: React.FC = () => {
@@ -19,5 +21,3 @@ const PlaybackScreen: React.FC = () => {
         </div>
     );
 };
-
-export default PlaybackScreen;
