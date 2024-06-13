@@ -5,7 +5,6 @@ export default function HomePage() {
     return (
         <div>
             <TextRecorder />
-            <Link href="/playback">Go to Playback</Link>
         </div>
     );
 }
