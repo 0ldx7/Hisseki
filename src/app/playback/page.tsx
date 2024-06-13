@@ -1,6 +1,5 @@
 "use client"; // クライアントサイドで実行するコンポーネントであることを示す
 import React, { useEffect, useState } from 'react'; // Reactのフックをインポート
-import { useSearchParams } from 'next/navigation'; // Next.jsの検索パラメータフックをインポート
 import { diff_match_patch, patch_obj } from 'diff-match-patch'; // テキスト差分を扱うためのライブラリをインポート
 
 // 入力記録の型を定義
@@ -13,22 +12,36 @@ type InputRecord = {
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>(''); // 現在のテキストを管理するための状態フック
     const [records, setRecords] = useState<InputRecord[]>([]); // テキストの変更記録を管理するための状態フック
-    const searchParams = useSearchParams(); // URLの検索パラメータを取得するためのフック
     const dmp = new diff_match_patch(); // diff_match_patchのインスタンスを作成
 
-    // コンポーネントがマウントされた時、および検索パラメータが変更された時に実行される
-    useEffect(() => {
-        const queryRecords = searchParams.get('records'); // URLから'records'を取得
-        if (queryRecords) { // 'records'が存在する場合
-            try {
-                // 取得した'records'をデコードし、JSONパースしてInputRecord型の配列に変換
-                const decodedRecords: InputRecord[] = JSON.parse(decodeURIComponent(queryRecords));
-                setRecords(decodedRecords); // 'records'の状態を更新
-            } catch (e) {
-                console.error("Failed to decode records:", e); // デコードやパースに失敗した場合のエラーハンドリング
-            }
+    // 追加: APIエンドポイントから記録データを取得する関数
+    const fetchRecords = async () => {
+        const response = await fetch('/api/getRecords');
+        if (response.ok) {
+            const data: InputRecord[] = await response.json();
+            setRecords(data);
+        } else {
+            console.error('Failed to fetch records');
         }
-    }, [searchParams]); // 依存配列に'searchParams'を指定することで、'searchParams'が変更されるたびにこのeffectが実行される
+    };
+
+    // コンポーネントがマウントされた時、および検索パラメータが変更された時に実行される
+    // useEffect(() => {
+    //     const queryRecords = searchParams.get('records'); // URLから'records'を取得
+    //     if (queryRecords) { // 'records'が存在する場合
+    //         try {
+    //             // 取得した'records'をデコードし、JSONパースしてInputRecord型の配列に変換
+    //             const decodedRecords: InputRecord[] = JSON.parse(decodeURIComponent(queryRecords));
+    //             setRecords(decodedRecords); // 'records'の状態を更新
+    //         } catch (e) {
+    //             console.error("Failed to decode records:", e); // デコードやパースに失敗した場合のエラーハンドリング
+    //         }
+    //     }
+    // }, [searchParams]); // 依存配列に'searchParams'を指定することで、'searchParams'が変更されるたびにこのeffectが実行される
+    useEffect(() => {
+        fetchRecords();
+    }, []);
+
 
     // テキストの変更を再生するための関数
     const playback = () => {

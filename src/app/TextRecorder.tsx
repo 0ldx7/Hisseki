@@ -49,10 +49,20 @@ const TextRecorder: React.FC = () => {
         setLastText(newText); // 現在のテキストを前回のテキストとして設定
     };
 
-    // 再生画面への移動を処理する関数
-    const goToPlaybackScreen = () => {
-        const url = `/playback?records=${encodeURIComponent(JSON.stringify(records))}`; // 記録をURLパラメータとしてエンコード
-        router.push(url); // 指定したURLに遷移
+    const saveRecords = async () => {
+        const response = await fetch('/api/saveRecords', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(records)
+        });
+
+        if (response.ok) {
+            router.push('/playback');
+        } else {
+            console.error('Failed to save records');
+        }
     };
 
     return (
@@ -65,7 +75,8 @@ const TextRecorder: React.FC = () => {
             />
             <button
                 className="w-full py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                onClick={goToPlaybackScreen} // 再生画面への移動を処理
+                // 修正: goToPlaybackScreenの代わりにsaveRecordsを呼び出す
+                onClick={saveRecords}
             >
                 Go to Playback Screen
             </button>
