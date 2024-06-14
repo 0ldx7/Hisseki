@@ -50,7 +50,7 @@ const TextRecorder: React.FC = () => {
     };
 
     const saveRecords = async () => {
-        const response = await fetch('/api/saveRecords', {
+        const response = await fetch('/api/saveRecords/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
