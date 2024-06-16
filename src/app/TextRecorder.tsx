@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
@@ -10,14 +10,17 @@ type InputRecord = {
     timeDiff: number;
 };
 
+// セッションIDの生成
+const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
+
 const TextRecorder: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [lastText, setLastText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
+    const [sessionId, setSessionId] = useState<string>(generateSessionId());
     const dmp = new diff_match_patch();
     const router = useRouter();
 
-    // 初回レンダリング時に以前の入力記録をlocalから読み込み、入力情報をstateに反映
     useEffect(() => {
         const savedRecords = localStorage.getItem('textRecords');
         if (savedRecords) {
@@ -25,12 +28,10 @@ const TextRecorder: React.FC = () => {
         }
     }, []);
 
-    // recordsが変更されるたびにlocalStorageに保存する
     useEffect(() => {
         localStorage.setItem('textRecords', JSON.stringify(records));
     }, [records]);
 
-    // テキストエリアの入力が変更された時に呼び出される関数
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         const newText = event.target.value;
         setText(newText);
@@ -40,7 +41,6 @@ const TextRecorder: React.FC = () => {
         const currentTime = Date.now();
         const timeDiff = records.length > 0 ? currentTime - records[records.length - 1].timestamp : 0;
 
-        // 新しい記録を追加
         setRecords((prevRecords) => [
             ...prevRecords,
             { diffs: patches, timestamp: currentTime, timeDiff: timeDiff }
@@ -48,7 +48,6 @@ const TextRecorder: React.FC = () => {
         setLastText(newText);
     };
 
-    // Fetch request example for saving records
     const saveRecords = async () => {
         try {
             const response = await fetch('/api/saveRecords', {
@@ -56,12 +55,12 @@ const TextRecorder: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(records)
+                body: JSON.stringify({ sessionId, records })
             });
 
             if (response.ok) {
                 console.log('Records saved successfully');
-                router.push('/playback');
+                router.push(`/playback?sessionId=${sessionId}`);
             } else {
                 const errorData = await response.json();
                 console.error('Failed to save records:', errorData);
