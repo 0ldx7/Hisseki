@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// SupabaseのURLとキーを取得
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: Request) {
     const url = new URL(request.url);

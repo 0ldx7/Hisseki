@@ -1,7 +1,8 @@
-"use client"; 
+"use client";
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
+import { supabase } from '../utils/supabaseClient';
 
 // 入力記録の型を定義
 type InputRecord = {
@@ -81,7 +82,7 @@ const TextRecorder: React.FC = () => {
                 className="w-full py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                 onClick={saveRecords}
             >
-                Go to Playback Screen
+                記述を終える
             </button>
             <div>
                 <h4 className="text-lg font-semibold">Input Records</h4>
