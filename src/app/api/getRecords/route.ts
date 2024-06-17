@@ -21,14 +21,17 @@ export async function GET(request: Request) {
             .eq('session_id', sessionId);
 
         if (error) {
-            console.error('Error fetching records:', error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json(data, { status: 200 });
+        const mappedData = data.map(record => ({
+            ...record,
+            timeDiff: record.time_diff || 1000
+        }));
+
+        return NextResponse.json(mappedData, { status: 200 });
 
     } catch (err) {
-        console.error('Exception caught:', err);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
