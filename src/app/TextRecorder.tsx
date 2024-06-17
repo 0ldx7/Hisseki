@@ -13,6 +13,7 @@ type InputRecord = {
 
 // セッションIDの生成
 const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
+const LOCAL_STORAGE_KEY = 'textRecords';
 
 const TextRecorder: React.FC = () => {
     const [text, setText] = useState<string>('');
@@ -23,14 +24,22 @@ const TextRecorder: React.FC = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const savedRecords = localStorage.getItem('textRecords');
-        if (savedRecords) {
-            setRecords(JSON.parse(savedRecords));
+        try {
+            const savedRecords = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedRecords) {
+                setRecords(JSON.parse(savedRecords));
+            }
+        } catch (error) {
+            console.error('Failed to load records from localStorage:', error);
         }
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('textRecords', JSON.stringify(records));
+        try {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(records));
+        } catch (error) {
+            console.error('Failed to save records to localStorage:', error);
+        }
     }, [records]);
 
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -86,7 +95,7 @@ const TextRecorder: React.FC = () => {
             </button>
             <div>
                 <h4 className="text-lg font-semibold">Input Records</h4>
-                <ul className="list-disc space-y-2">
+                <ul className="list-disc space-y-2 h-48 overflow-y-auto">
                     {records.map((record, index) => (
                         <li key={index} className="text-sm">{`Changes recorded at ${record.timestamp}`}</li>
                     ))}

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
-import { supabase } from '../../utils/supabaseClient'; // supabaseClientをインポート
+import { supabase } from '../../utils/supabaseClient';
 
 type InputRecord = {
     diffs: patch_obj[];
@@ -23,26 +23,21 @@ const Playback: React.FC = () => {
             return;
         }
 
-        const response = await fetch(`/api/getRecords?sessionId=${sessionId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
+        try {
+            const response = await fetch(`/api/getRecords?sessionId=${sessionId}`);
+            if (response.ok) {
+                const data: InputRecord[] = await response.json();
+                data.forEach((record, index) => {
+                    if (record.timeDiff === undefined || record.timeDiff === 0) {
+                        data[index].timeDiff = 1000;
+                    }
+                });
+                setRecords(data);
+            } else {
+                console.error('Failed to fetch records');
             }
-        });
-
-        if (response.ok) {
-            const data: InputRecord[] = await response.json();
-            console.log('Fetched records:', data);
-
-            data.forEach((record, index) => {
-                if (record.timeDiff === undefined || record.timeDiff === 0) {
-                    data[index].timeDiff = 1000;
-                }
-            });
-
-            setRecords(data);
-        } else {
-            console.error('Failed to fetch records');
+        } catch (error) {
+            console.error('Error fetching records:', error);
         }
     };
 
@@ -57,16 +52,11 @@ const Playback: React.FC = () => {
 
         const playNext = () => {
             if (currentIndex >= records.length) {
-                console.log('All records have been played');
                 return;
             }
 
             const record = records[currentIndex++];
-            console.log(`Record ${currentIndex - 1}:`, record);
             const [newText, results] = dmp.patch_apply(record.diffs, currentText);
-            console.log(`Applying patches for record ${currentIndex - 1}:`, record.diffs);
-            console.log(`Patch results for record ${currentIndex - 1}:`, results);
-            console.log(`Updated text for record ${currentIndex - 1}:`, newText);
 
             if (results.some(result => !result)) {
                 console.error('Patch application failed:', record.diffs, currentText);
@@ -77,8 +67,6 @@ const Playback: React.FC = () => {
 
             if (currentIndex < records.length) {
                 const nextTimeDiff = records[currentIndex]?.timeDiff ?? 1000;
-                console.log(`TimeDiff for record ${currentIndex - 1}:`, record.timeDiff);
-                console.log(`Next timeDiff:`, nextTimeDiff);
                 setTimeout(playNext, nextTimeDiff);
             }
         };
