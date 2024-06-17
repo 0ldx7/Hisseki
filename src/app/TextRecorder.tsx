@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';

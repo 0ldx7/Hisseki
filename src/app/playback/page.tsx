@@ -5,9 +5,10 @@ import { diff_match_patch, patch_obj } from 'diff-match-patch';
 
 // 型定義：入力記録の構造を定義
 type InputRecord = {
-    diffs: patch_obj[];
-    timestamp: number;
-    timeDiff: number;
+    diffs: patch_obj[];  // テキストの変更を表す差分
+    timestamp: number;   // 変更が記録された時間のタイムスタンプ
+    time_diff: number;    // 前回の記録からの時間差
+    timeDiff?: number; // timeDiffを明示的に追加
 };
 
 const Playback: React.FC = () => {
@@ -33,17 +34,17 @@ const Playback: React.FC = () => {
         });
 
         if (response.ok) {
-            const data: InputRecord[] = await response.json();  // JSONレスポンスをパース
+            const data = await response.json();  // JSONレスポンスをパース
             console.log('Fetched records:', data);  // デバッグ用ログ
 
-            // すべてのレコードの`timeDiff`を確認し、未定義の場合はデフォルト値を設定
-            data.forEach((record, index) => {
-                if (record.timeDiff === undefined) {
-                    data[index].timeDiff = 1000;  // デフォルト値として1000msを設定
-                }
-            });
+            // time_diffをtimeDiffとしてマッピング
+            const mappedData = data.map((record: InputRecord) => ({
+                ...record,
+                timeDiff: record.time_diff,
+            }));
 
-            setRecords(data);  // 記録を状態に設定
+            console.log('Mapped records:', mappedData);
+            setRecords(mappedData);  // 記録を状態に設定
         } else {
             console.error('Failed to fetch records');
         }
@@ -84,7 +85,7 @@ const Playback: React.FC = () => {
                 const nextTimeDiff = records[currentIndex]?.timeDiff ?? 1000; // 次の記録のtimeDiffを取得し、undefinedの場合はデフォルト値1000msを設定
                 console.log(`TimeDiff for record ${currentIndex - 1}:`, record.timeDiff);  // デバッグ用ログ
                 console.log(`Next timeDiff:`, nextTimeDiff); // 次のtimeDiffをログに出力
-                setTimeout(playNext, record.timeDiff);  // 次の変更を記録された時間差後に実行
+                setTimeout(playNext, nextTimeDiff);  // 次の変更を記録された時間差後に実行
             }
         };
 
