@@ -2,14 +2,7 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
-import { supabase } from '../utils/supabaseClient';
-
-// 入力記録の型を定義
-type InputRecord = {
-    diffs: patch_obj[];
-    timestamp: number;
-    timeDiff: number;
-};
+import { InputRecord } from '../utils/paragraphPlayback';
 
 // セッションIDの生成
 const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
@@ -20,6 +13,9 @@ const TextRecorder: React.FC = () => {
     const [lastText, setLastText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
     const [sessionId, setSessionId] = useState<string>(generateSessionId());
+    const [timeLeft, setTimeLeft] = useState<number>(15 * 60); // 15分のカウントダウンタイマー
+    const [isRecording, setIsRecording] = useState<boolean>(true);
+    const [hasStarted, setHasStarted] = useState<boolean>(false); // 初回入力トリガー
     const dmp = new diff_match_patch();
     const router = useRouter();
 
@@ -42,8 +38,36 @@ const TextRecorder: React.FC = () => {
         }
     }, [records]);
 
+    useEffect(() => {
+        if (hasStarted) {
+            const timer = setInterval(() => {
+                setTimeLeft((prevTime) => {
+                    if (prevTime <= 1) {
+                        setIsRecording(false);
+                        clearInterval(timer);
+                        return 0;
+                    }
+                    return prevTime - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(timer);
+        }
+    }, [hasStarted]);
+
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        if (!isRecording) return;
+
+        if (!hasStarted) {
+            setHasStarted(true); // 初回入力時にタイマーを開始
+        }
+
         const newText = event.target.value;
+
+        if (newText.length > 500) {
+            return; // 500文字を超える入力を拒否
+        }
+
         setText(newText);
         const diffs = dmp.diff_main(lastText, newText);
         dmp.diff_cleanupSemantic(diffs);
@@ -51,14 +75,22 @@ const TextRecorder: React.FC = () => {
         const currentTime = Date.now();
         const timeDiff = records.length > 0 ? currentTime - records[records.length - 1].timestamp : 0;
 
-        setRecords((prevRecords) => [
-            ...prevRecords,
-            { diffs: patches, timestamp: currentTime, timeDiff: timeDiff }
-        ]);
+        if (records.length < 1500) {
+            setRecords((prevRecords) => [
+                ...prevRecords,
+                { diffs: patches, timestamp: currentTime, timeDiff: timeDiff }
+            ]);
+        }
+        
         setLastText(newText);
     };
 
     const saveRecords = async () => {
+        if (records.length === 0) {
+            console.error('No records to save');
+            return;
+        }
+
         try {
             const response = await fetch('/api/saveRecords', {
                 method: 'POST',
@@ -86,20 +118,24 @@ const TextRecorder: React.FC = () => {
                 className="w-full h-48 p-2 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded"
                 value={text}
                 onChange={handleInputChange}
+                maxLength={500} // 直接HTMLの属性としても設定
+                disabled={!isRecording}
             />
-            <button
-                className="w-full py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                onClick={saveRecords}
-            >
-                記述を終える
-            </button>
-            <div>
-                <h4 className="text-lg font-semibold">Input Records</h4>
-                <ul className="list-disc space-y-2 h-48 overflow-y-auto">
-                    {records.map((record, index) => (
-                        <li key={index} className="text-sm">{`Changes recorded at ${record.timestamp}`}</li>
-                    ))}
+            <div className="items-center">
+                <h4 className="text-sm font-semibold">limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
+                <button
+                    className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    onClick={saveRecords}
+                    disabled={!isRecording}
+                >
+                    筆跡を再生する
+                </button>
+                <ul className='pt-3'>
+                    <li>文字数制限は500文字です。</li>
+                    <li>タイマーが時間切れになると自動的に再生画面に遷移します。</li>
+                    <li>入力した筆跡は共有URLで保存することができます。再生ボタンを</li>
                 </ul>
+                
             </div>
         </div>
     );

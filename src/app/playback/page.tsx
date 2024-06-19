@@ -1,11 +1,10 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
-import { supabase } from '../../utils/supabaseClient';
 
 type InputRecord = {
-    diffs: patch_obj[];
+    diffs: object[];
     timestamp: number;
     timeDiff: number;
 };
@@ -15,6 +14,7 @@ const Playback: React.FC = () => {
     const [records, setRecords] = useState<InputRecord[]>([]);
     const searchParams = useSearchParams();
     const dmp = new diff_match_patch();
+    const lastUpdateRef = useRef<number>(Date.now());
 
     const fetchRecords = async () => {
         const sessionId = searchParams.get('sessionId');
@@ -64,6 +64,7 @@ const Playback: React.FC = () => {
 
             setText(newText);
             currentText = newText;
+            lastUpdateRef.current = Date.now();
 
             if (currentIndex < records.length) {
                 const nextTimeDiff = records[currentIndex]?.timeDiff ?? 1000;
@@ -82,14 +83,24 @@ const Playback: React.FC = () => {
 
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
-            <h1 className="text-2xl font-bold">Playback Screen</h1>
-            <div className="whitespace-pre-wrap">{text}</div>
-            <button
-                className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                onClick={() => window.history.back()}
-            >
-                新しく筆跡を残す
-            </button>
+            {/* <h1 className="text-2xl font-bold">Playback Screen</h1> */}
+            <div className="whitespace-pre-wrap">
+                {text}
+            </div>
+            <div className="flex justify-between items-center">
+                <button
+                    className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    onClick={playback}
+                >
+                    最初から再生
+                </button>
+                <button
+                    className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    onClick={() => window.history.back()}
+                >
+                    新しく筆跡を残す
+                </button>
+            </div>
         </div>
     );
 };
