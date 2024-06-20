@@ -15,6 +15,7 @@ const Playback: React.FC = () => {
     const searchParams = useSearchParams();
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now());
+    const [shareLink, setShareLink] = useState<string>('');
 
     const fetchRecords = async () => {
         const sessionId = searchParams.get('sessionId');
@@ -33,6 +34,8 @@ const Playback: React.FC = () => {
                     }
                 });
                 setRecords(data);
+                // 共有リンクを生成
+                setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`);
             } else {
                 console.error('Failed to fetch records');
             }
@@ -81,9 +84,17 @@ const Playback: React.FC = () => {
         }
     }, [records]);
 
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(shareLink).then(() => {
+            alert('共有リンクをクリップボードにコピーしました');
+        }).catch(err => {
+            console.error('リンクのコピーに失敗しました', err);
+        });
+    };
+
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
-            {/* <h1 className="text-2xl font-bold">Playback Screen</h1> */}
+            <h1 className="text-2xl font-bold">Playback Screen</h1>
             <div className="whitespace-pre-wrap">
                 {text}
             </div>
@@ -101,6 +112,25 @@ const Playback: React.FC = () => {
                     新しく筆跡を残す
                 </button>
             </div>
+            {shareLink && (
+                <div className="mt-4">
+                    <p className="text-sm text-gray-600">以下のリンクを共有して、再生結果を共有</p>
+                    <div className="flex items-center mt-2">
+                        <input
+                            type="text"
+                            value={shareLink}
+                            readOnly
+                            className="flex-grow p-2 border border-gray-300 rounded"
+                        />
+                        <button
+                            className="ml-2 py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                            onClick={copyToClipboard}
+                        >
+                            コピー
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
