@@ -9,6 +9,8 @@ type InputRecord = {
     timeDiff: number;
 };
 
+const MIN_INTERVAL = 100; // 最低時間間隔を100msに設定
+
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
@@ -70,7 +72,7 @@ const Playback: React.FC = () => {
             lastUpdateRef.current = Date.now();
 
             if (currentIndex < records.length) {
-                const nextTimeDiff = records[currentIndex]?.timeDiff ?? 1000;
+                const nextTimeDiff = Math.max(records[currentIndex]?.timeDiff ?? 1000, MIN_INTERVAL);
                 setTimeout(playNext, nextTimeDiff);
             }
         };
@@ -114,7 +116,7 @@ const Playback: React.FC = () => {
             </div>
             {shareLink && (
                 <div className="mt-4">
-                    <p className="text-sm text-gray-600">以下のリンクを共有して、再生結果を共有</p>
+                    <p className="text-sm text-gray-600">以下のリンクを共有して、再生結果を共有できます:</p>
                     <div className="flex items-center mt-2">
                         <input
                             type="text"
