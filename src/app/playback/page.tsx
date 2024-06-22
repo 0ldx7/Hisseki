@@ -14,6 +14,7 @@ const MIN_INTERVAL = 100; // 最低時間間隔を100msに設定
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
+    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null);
     const searchParams = useSearchParams();
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now());
@@ -38,6 +39,11 @@ const Playback: React.FC = () => {
                 setRecords(data);
                 // 共有リンクを生成
                 setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`);
+                // 初回再生時刻をローカルストレージから取得
+                const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
+                if (storedTime) {
+                    setInitialPlaybackTime(storedTime);
+                }
             } else {
                 console.error('Failed to fetch records');
             }
@@ -54,6 +60,14 @@ const Playback: React.FC = () => {
         let currentIndex = 0;
         let currentText = '';
         setText('');
+
+        // 初回再生時刻を記憶
+        const sessionId = searchParams.get('sessionId');
+        if (!initialPlaybackTime && sessionId) {
+            const currentTime = new Date().toLocaleString();
+            localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
+            setInitialPlaybackTime(currentTime);
+        }
 
         const playNext = () => {
             if (currentIndex >= records.length) {
@@ -131,6 +145,11 @@ const Playback: React.FC = () => {
                             コピー
                         </button>
                     </div>
+                </div>
+            )}
+            {initialPlaybackTime && (
+                <div className="mt-4">
+                    <p className="text-sm text-gray-600">初回再生時刻: {initialPlaybackTime}</p>
                 </div>
             )}
         </div>
