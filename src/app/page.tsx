@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import TextRecorder from './TextRecorder';
+import TextRecorder from './TextRecorder/page';
 import Concept from './Concept/page';
 
 export default function HomePage() {

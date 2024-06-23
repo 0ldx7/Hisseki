@@ -149,7 +149,7 @@ const Playback: React.FC = () => {
             )}
             {initialPlaybackTime && (
                 <div className="mt-4">
-                    <p className="text-sm text-gray-600">初回再生時刻: {initialPlaybackTime}</p>
+                    <p className="text-sm text-gray-600">{initialPlaybackTime}</p>
                 </div>
             )}
         </div>
