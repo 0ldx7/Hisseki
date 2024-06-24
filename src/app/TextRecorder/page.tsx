@@ -2,8 +2,13 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
-import { InputRecord } from '../../utils/paragraphPlayback';
-// import { logError } from '../../utils/errorHandler';
+import { logError } from '../../utils/errorHandler';
+
+type InputRecord = {
+    diffs: object[];
+    timestamp: number;
+    timeDiff: number;
+};
 
 // セッションIDを生成する関数。ランダムな文字列を生成。
 const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
@@ -21,42 +26,44 @@ const TextRecorder: React.FC = () => {
     // タイマーが開始されたら、1秒ごとにカウントダウンを行う
     useEffect(() => {
         if (recordingStatus === 'recording') {
-            const timer = setInterval(() => {
-                setTimeLeft((prevTime) => {
+            const timer = setInterval(() => { //一秒ごとに実行されるコールバック関数
+                setTimeLeft((prevTime) => { //stateのセッタ関数に現在のprevTimeを渡し、時間更新
                     if (prevTime <= 1) {
                         setRecordingStatus('stopped'); // 残り時間が1秒以下なら録音を停止
                         clearInterval(timer); // タイマーをクリア
                         // return 0;
                         location.reload(); //ページを自動リロードしリセット
                     }
-                    return prevTime - 1;
+                    return prevTime - 1; //stateを一秒ごとに減少させ、カウントダウンを再現
                 });
             }, 1000); //一秒ごとにuseEffect更新
 
-            return () => clearInterval(timer); // クリーンアップ関数
+            // return () => clearInterval(timer); // クリーンアップ関数
         }
     }, [recordingStatus]);
 
     // テキストエリアの変更を処理する関数
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (recordingStatus === 'stopped') return; // 録音が停止している場合は何もしない
+        if (recordingStatus === 'stopped') return; // 記録停止している場合は機能しない
 
-        if (recordingStatus === 'notStarted') {
-            setRecordingStatus('recording'); // 初回入力時にタイマーを開始
+        if (recordingStatus === 'notStarted') { //stateが初期値の場合、
+            setRecordingStatus('recording'); // 初回入力時にタイマーを開始、useEffect起動
         }
 
         const newText = event.target.value; // 新しいテキストの内容
 
         if (newText.length > 500) {
+            alert("文字数の上限に達しています");
             return; // 500文字を超える入力を拒否
         }
 
-        setText(newText); // 新しいテキストを状態にセット
+        setText(newText); // 新しいテキストをstateにセット
         const diffs = dmp.diff_main(lastText, newText); // テキストの差分を計算
         dmp.diff_cleanupSemantic(diffs); // 差分をセマンティックにクリーンアップ
         const patches = dmp.patch_make(lastText, newText, diffs); // 差分からパッチを作成
-        const currentTime = Date.now(); // 現在のタイムスタンプ
+        const currentTime = Date.now(); // 現在時刻をミリ秒単位で取得
         const timeDiff = records.length > 0 ? currentTime - records[records.length - 1].timestamp : 0; // 最後のレコードからの時間差
+        // currentTimeから一つ前のrecordのtimeStampを引いて、差分時間を計算
 
         if (records.length < 1500) { // レコード数が1500未満の場合
             setRecords((prevRecords) => [
@@ -65,13 +72,17 @@ const TextRecorder: React.FC = () => {
             ]); // 新しいレコードを追加
         }
 
+        if (records.length > 1500) { //レコード数が1500を超過した場合、
+            location.reload(); //自動的にページをリロードし、テキストリセット
+        };
+
         setLastText(newText); // 最後のテキストを更新
     };
 
     // レコードを保存する関数
     const saveRecords = async () => {
         if (records.length === 0) { // レコードがない場合はエラー
-            // logError('No records to save', null);
+            logError('No records to save', null);
             return;
         }
 
@@ -86,13 +97,13 @@ const TextRecorder: React.FC = () => {
 
             if (response.ok) {
                 console.log('Records saved successfully');
-                router.push(`/playback?sessionId=${sessionId}`); // 再生画面にリダイレクト
+                router.push(`/playback?sessionId=${sessionId}`); // クエリパラメータを付与し、再生画面にリダイレクト
             } else {
                 const errorData = await response.json();
-                // logError('Failed to save records', errorData);
+                logError('Failed to save records', errorData);
             }
         } catch (error) {
-            // logError('An unexpected error occurred', error);
+            logError('An unexpected error occurred', error);
         }
     };
 
