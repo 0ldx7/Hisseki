@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation'; // Next.jsのルーターからクエリパラメータを取得するためのフック
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
+import { logError } from '@/utils/errorHandler';
 
+// 入力レコードの型定義
 type InputRecord = {
     diffs: object[];
     timestamp: number;
@@ -11,100 +13,106 @@ type InputRecord = {
 
 const MIN_INTERVAL = 100; // 最低時間間隔を100msに設定
 
+// Playbackコンポーネントの定義
 const Playback: React.FC = () => {
-    const [text, setText] = useState<string>('');
-    const [records, setRecords] = useState<InputRecord[]>([]);
-    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null);
-    const searchParams = useSearchParams();
+    const [text, setText] = useState<string>(''); // 再生中のテキストを保持
+    const [records, setRecords] = useState<InputRecord[]>([]); // 入力レコードを保持
+    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null); // 初回再生時刻を保持
+    const searchParams = useSearchParams(); // クエリパラメータを取得
     const dmp = new diff_match_patch();
-    const lastUpdateRef = useRef<number>(Date.now());
-    const [shareLink, setShareLink] = useState<string>('');
+    const lastUpdateRef = useRef<number>(Date.now()); // 最後の更新時刻を保持する参照
+    const [shareLink, setShareLink] = useState<string>(''); // 共有リンクを保持
 
+    // レコードを取得する非同期関数
     const fetchRecords = async () => {
-        const sessionId = searchParams.get('sessionId');
+        const sessionId = searchParams.get('sessionId'); // クエリパラメータからセッションIDを取得
         if (!sessionId) {
-            console.error('Session ID not found');
+            logError('Session ID not found', null); // セッションIDが見つからない場合のエラーメッセージ
             return;
         }
 
         try {
-            const response = await fetch(`/api/getRecords?sessionId=${sessionId}`);
-            if (response.ok) {
-                const data: InputRecord[] = await response.json();
-                data.forEach((record, index) => {
+            const response = await fetch(`/api/getRecords?sessionId=${sessionId}`); // APIからレコードを取得
+            if (response.ok) { //リクエストが成功した場合、
+                const data: InputRecord[] = await response.json(); // レスポンスをJSONとしてパース
+                data.forEach((record, index) => { //recodesのtimeDiffを確認する
                     if (record.timeDiff === undefined || record.timeDiff === 0) {
-                        data[index].timeDiff = 1000;
+                        data[index].timeDiff = 1000; // timeDiffが未定義または0の場合、1000msに設定
+                        console.log('TimeDiff is null or undefined')
                     }
                 });
-                setRecords(data);
-                // 共有リンクを生成
-                setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`);
-                // 初回再生時刻をローカルストレージから取得
-                const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
+                setRecords(data); // レコードをstateにセット
+                setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`); // 共有リンクを生成しstateに反映
+                const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`); // ローカルストレージから初回再生時刻を取得
                 if (storedTime) {
-                    setInitialPlaybackTime(storedTime);
+                    setInitialPlaybackTime(storedTime); // 初回再生時刻を状態にセット
                 }
             } else {
-                console.error('Failed to fetch records');
+                const errorData = await response.json();
+                logError('Failed to fetch records', errorData); // レコードの取得に失敗した場合のエラーメッセージ
             }
         } catch (error) {
-            console.error('Error fetching records:', error);
+            logError('Error fetching records:', error); // 非同期操作でエラーが発生した場合のエラーメッセージ
         }
     };
 
+    // コンポーネントの初回マウント時にレコードを取得
     useEffect(() => {
         fetchRecords();
     }, []);
 
+    // テキスト再生機能
     const playback = () => {
-        let currentIndex = 0;
-        let currentText = '';
-        setText('');
+        let currentIndex = 0; // 現在の再生インデックスを初期化
+        let currentText = ''; // 現在のテキストを初期化
+        setText(''); // 表示テキストをリセット
 
-        // 初回再生時刻を記憶
-        const sessionId = searchParams.get('sessionId');
+        const sessionId = searchParams.get('sessionId'); // クエリパラメータからセッションIDを取得
         if (!initialPlaybackTime && sessionId) {
-            const currentTime = new Date().toLocaleString();
-            localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
-            setInitialPlaybackTime(currentTime);
+            const currentTime = new Date().toLocaleString(); // ローカライズした現在時刻を文字列として取得
+            localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime); // 一意のキーを設定し、初回再生時刻をローカルストレージに保存
+            setInitialPlaybackTime(currentTime); // 初回再生時刻を状態にセット
         }
 
+        // 次のレコードを再生する関数
         const playNext = () => {
             if (currentIndex >= records.length) {
-                return;
+                return; // 再生が終了した場合、関数を終了
             }
 
-            const record = records[currentIndex++];
-            const [newText, results] = dmp.patch_apply(record.diffs, currentText);
+            const record = records[currentIndex++]; // 現在のレコードを取得し、インデックスをインクリメント
+            const [newText, results] = dmp.patch_apply(record.diffs, currentText); // パッチを適用して新しいテキストを生成
 
             if (results.some(result => !result)) {
-                console.error('Patch application failed:', record.diffs, currentText);
+                console.error('Patch application failed:', record.diffs, currentText); // パッチの適用に失敗した場合のエラーメッセージ
             }
 
-            setText(newText);
-            currentText = newText;
-            lastUpdateRef.current = Date.now();
+            setText(newText); // 新しいテキストを状態にセット
+            currentText = newText; // 現在のテキストを更新
+            lastUpdateRef.current = Date.now(); // 最後の更新時刻を現在の時刻に設定
 
             if (currentIndex < records.length) {
-                const nextTimeDiff = Math.max(records[currentIndex]?.timeDiff ?? 1000, MIN_INTERVAL);
-                setTimeout(playNext, nextTimeDiff);
+                const nextTimeDiff = Math.max(records[currentIndex]?.timeDiff ?? 1000, MIN_INTERVAL); // 次の再生タイミングを計算
+                setTimeout(playNext, nextTimeDiff); // 次の再生をスケジュール
             }
         };
 
-        playNext();
+        playNext(); // 初回再生を開始
     };
 
+    // レコードが取得された後に再生を開始するuseEffectフック
     useEffect(() => {
         if (records.length > 0) {
-            playback();
+            playback(); // 再生を開始
         }
     }, [records]);
 
+    // 共有リンクをクリップボードにコピーする関数
     const copyToClipboard = () => {
         navigator.clipboard.writeText(shareLink).then(() => {
-            alert('共有リンクをクリップボードにコピーしました');
-        }).catch(err => {
-            console.error('リンクのコピーに失敗しました', err);
+            alert('共有リンクをクリップボードにコピーしました'); // コピー成功時のアラート
+        }).catch(error => {
+            logError('リンクのコピーに失敗しました', error); // コピー失敗時のエラーメッセージ
         });
     };
 
@@ -112,7 +120,7 @@ const Playback: React.FC = () => {
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
             <h1 className="text-2xl font-bold">Playback Screen</h1>
             <div className="whitespace-pre-wrap">
-                {text}
+                {text} {/* 再生中のテキストを表示 */}
             </div>
             <div className="flex justify-between items-center">
                 <button
@@ -149,11 +157,11 @@ const Playback: React.FC = () => {
             )}
             {initialPlaybackTime && (
                 <div className="mt-4">
-                    <p className="text-sm text-gray-600">{initialPlaybackTime}</p>
+                    <p className="text-sm text-gray-600">{initialPlaybackTime}</p> {/* 初回再生時刻を表示 */}
                 </div>
             )}
         </div>
     );
 };
 
-export default Playback;
+export default Playback; // Playbackコンポーネントをエクスポート
