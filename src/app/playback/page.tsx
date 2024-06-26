@@ -2,6 +2,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation'; // Next.jsのルーターからクエリパラメータを取得するためのフック
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaste } from '@fortawesome/free-regular-svg-icons';
+import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
+import { faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import { logError } from '@/utils/errorHandler';
 
 // 入力レコードの型定義
@@ -119,7 +123,7 @@ const Playback: React.FC = () => {
 
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
-            <div className="whitespace-pre-wrap">
+            <div className="whitespace-pre-wrap max-w-md">
                 {text} {/* 再生中のテキストを表示 */}
             </div>
                 <div className="mt-4">
@@ -130,12 +134,14 @@ const Playback: React.FC = () => {
                     className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     onClick={playback}
                 >
+                    <FontAwesomeIcon icon={faPlayCircle} />
                     最初から再生
                 </button>
                 <button
                     className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     onClick={() => window.history.back()}
                 >
+                    <FontAwesomeIcon icon={faPenToSquare} />
                     新しく筆跡を残す
                 </button>
                 <div className="">
@@ -143,6 +149,7 @@ const Playback: React.FC = () => {
                             className="ml-2 py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             onClick={copyToClipboard}
                         >
+                <FontAwesomeIcon icon={faPaste} />
                             筆跡を共有する
                         </button>
                 </div>
