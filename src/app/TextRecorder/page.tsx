@@ -3,6 +3,8 @@ import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
 import { logError } from '../../utils/errorHandler';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons/faPlay';
 
 type InputRecord = {
     diffs: object[];
@@ -123,6 +125,7 @@ const TextRecorder: React.FC = () => {
                     onClick={saveRecords}
                     disabled={recordingStatus !== 'recording'}
                 >
+                    <FontAwesomeIcon icon={faPlay} />
                     筆跡を再生する
                 </button>
                 <ul className='pt-3'>

@@ -5,7 +5,7 @@ import { diff_match_patch, patch_obj } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaste } from '@fortawesome/free-regular-svg-icons';
 import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
-import { faPlayCircle } from '@fortawesome/free-regular-svg-icons';
+import { faReply } from '@fortawesome/free-solid-svg-icons/faReply';
 import { logError } from '@/utils/errorHandler';
 
 // 入力レコードの型定義
@@ -134,7 +134,7 @@ const Playback: React.FC = () => {
                     className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     onClick={playback}
                 >
-                    <FontAwesomeIcon icon={faPlayCircle} />
+                    <FontAwesomeIcon icon={faReply} />
                     最初から再生
                 </button>
                 <button
