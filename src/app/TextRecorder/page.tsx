@@ -23,7 +23,7 @@ const TextRecorder: React.FC = () => {
     const dmp = new diff_match_patch(); // diff-match-patch インスタンス
     const router = useRouter(); // Next.js のルーター
 
-    // タイマーが開始されたら、1秒ごとにカウントダウンを行う
+    // カウントダウン
     useEffect(() => {
         if (recordingStatus === 'recording') {
             const timer = setInterval(() => { //一秒ごとに実行されるコールバック関数

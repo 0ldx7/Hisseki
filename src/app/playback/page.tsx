@@ -67,6 +67,7 @@ const Playback: React.FC = () => {
         let currentText = ''; // 現在のテキストを初期化
         setText(''); // 表示テキストをリセット
 
+        //初回再生時刻を記録
         const sessionId = searchParams.get('sessionId'); // クエリパラメータからセッションIDを取得
         if (!initialPlaybackTime && sessionId) {
             const currentTime = new Date().toLocaleString(); // ローカライズした現在時刻を文字列として取得
@@ -80,10 +81,10 @@ const Playback: React.FC = () => {
                 return; // 再生が終了した場合、関数を終了
             }
 
-            const record = records[currentIndex++]; // 現在のレコードを取得し、インデックスをインクリメント
+            const record = records[currentIndex++]; // 現在のレコードを取得し、次のインデックスをインクリメント
             const [newText, results] = dmp.patch_apply(record.diffs, currentText); // パッチを適用して新しいテキストを生成
 
-            if (results.some(result => !result)) {
+            if (results.some(result => !result)) { //resultがfalseの場合、
                 console.error('Patch application failed:', record.diffs, currentText); // パッチの適用に失敗した場合のエラーメッセージ
             }
 
@@ -118,10 +119,12 @@ const Playback: React.FC = () => {
 
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
-            <h1 className="text-2xl font-bold">Playback Screen</h1>
             <div className="whitespace-pre-wrap">
                 {text} {/* 再生中のテキストを表示 */}
             </div>
+                <div className="mt-4">
+                    <p className="text-sm text-gray-600">{initialPlaybackTime}</p> {/* 初回再生時刻を表示 */}
+                </div>
             <div className="flex justify-between items-center">
                 <button
                     className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -135,31 +138,15 @@ const Playback: React.FC = () => {
                 >
                     新しく筆跡を残す
                 </button>
-            </div>
-            {shareLink && (
-                <div className="mt-4">
-                    <p className="text-sm text-gray-600">以下のリンクを共有して、再生結果を共有できます:</p>
-                    <div className="flex items-center mt-2">
-                        <input
-                            type="text"
-                            value={shareLink}
-                            readOnly
-                            className="flex-grow p-2 border border-gray-300 rounded"
-                        />
+                <div className="">
                         <button
                             className="ml-2 py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             onClick={copyToClipboard}
                         >
-                            コピー
+                            筆跡を共有する
                         </button>
-                    </div>
                 </div>
-            )}
-            {initialPlaybackTime && (
-                <div className="mt-4">
-                    <p className="text-sm text-gray-600">{initialPlaybackTime}</p> {/* 初回再生時刻を表示 */}
-                </div>
-            )}
+            </div>
         </div>
     );
 };
