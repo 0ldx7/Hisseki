@@ -1,4 +1,3 @@
-// TextRecorder/page.tsx
 "use client";
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,7 +19,7 @@ const TextRecorder: React.FC = () => {
     const [lastText, setLastText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
     const [sessionId, setSessionId] = useState<string>(generateSessionId());
-    const [timeLeft, setTimeLeft] = useState<number>(1 * 60);
+    const [timeLeft, setTimeLeft] = useState<number>(15 * 60);
     const [recordingStatus, setRecordingStatus] = useState<'notStarted' | 'recording' | 'stopped'>('notStarted');
     const dmp = new diff_match_patch();
     const router = useRouter();
@@ -32,7 +31,7 @@ const TextRecorder: React.FC = () => {
                     if (prevTime <= 1) {
                         setRecordingStatus('stopped');
                         clearInterval(timer);
-                        saveRecords();
+                        location.reload();
                     }
                     return prevTime - 1;
                 });
@@ -50,7 +49,8 @@ const TextRecorder: React.FC = () => {
         const newText = event.target.value;
 
         if (newText.length > 500) {
-            saveRecords();
+            alert("文字数の上限に達しています");
+            return;
         }
 
         setText(newText);
@@ -68,7 +68,7 @@ const TextRecorder: React.FC = () => {
         }
 
         if (records.length > 1500) {
-            saveRecords();
+            location.reload();
         };
 
         setLastText(newText);
@@ -113,11 +113,29 @@ const TextRecorder: React.FC = () => {
             <div className="text-center">
                 <h4 className="text-lg mb-4">Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
                 <button
-                    className="py-2 px-6 mb-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 disabled:bg-gray-400"
+                    className="
+                        py-2 
+                        px-6 
+                        mb-4 
+                        m-auto 
+                        bg-gray-800 
+                        text-white
+                        font-semibold 
+                        rounded-lg 
+                        hover:bg-gray-700 
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-gray-500 
+                        focus:ring-opacity-50 
+                        disabled:bg-gray-400 
+                        flex 
+                        items-center 
+                        justify-center
+                    "
                     onClick={saveRecords}
                     disabled={recordingStatus !== 'recording'}
                 >
-                    <FontAwesomeIcon icon={faPlay} className="mr-2" />
+                    <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
                     筆跡を再生する
                 </button>
                 <ul className="list-disc list-inside text-left mx-auto max-w-md">

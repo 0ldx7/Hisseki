@@ -22,6 +22,7 @@ const Playback: React.FC = () => {
     const [text, setText] = useState<string>(''); // 再生中のテキストを保持
     const [records, setRecords] = useState<InputRecord[]>([]); // 入力レコードを保持
     const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null); // 初回再生時刻を保持
+    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false); // 再生中かどうかを追跡
     const searchParams = useSearchParams(); // クエリパラメータを取得
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now()); // 最後の更新時刻を保持する参照
@@ -67,6 +68,7 @@ const Playback: React.FC = () => {
 
     // テキスト再生機能
     const playback = () => {
+        setIsReplayDisabled(true); // 再生中に設定
         let currentIndex = 0; // 現在の再生インデックスを初期化
         let currentText = ''; // 現在のテキストを初期化
         setText(''); // 表示テキストをリセット
@@ -82,6 +84,7 @@ const Playback: React.FC = () => {
         // 次のレコードを再生する関数
         const playNext = () => {
             if (currentIndex >= records.length) {
+                setIsReplayDisabled(false); // 再生が終了した場合、再生中フラグをオフにする
                 return; // 再生が終了した場合、関数を終了
             }
 
@@ -99,6 +102,8 @@ const Playback: React.FC = () => {
             if (currentIndex < records.length) {
                 const nextTimeDiff = Math.max(records[currentIndex]?.timeDiff ?? 1000, MIN_INTERVAL); // 次の再生タイミングを計算
                 setTimeout(playNext, nextTimeDiff); // 次の再生をスケジュール
+            } else {
+                setIsReplayDisabled(false); // 再生が終了した場合、再生中フラグをオフにする
             }
         };
 
@@ -124,32 +129,81 @@ const Playback: React.FC = () => {
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
             <div className="whitespace-pre-wrap p-4 bg-gray-100 rounded-lg min-h-[200px]">
-                {text} {/* 再生中のテキストを表示 */}
+                {text}
             </div>
             <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600">{initialPlaybackTime}</p> {/* 初回再生時刻を表示 */}
+                <p className="
+                    text-sm
+                    text-gray-600
+                ">{initialPlaybackTime}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
                 <button
-                    className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="
+                        py-2
+                        px-4
+                        bg-gray-800 
+                        text-white 
+                        font-semibold 
+                        rounded-lg 
+                        hover:bg-gray-600 
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-blue-500 
+                        focus:ring-opacity-50 
+                        flex 
+                        items-center 
+                        justify-center 
+                        disabled:bg-gray-400
+                    "
                     onClick={playback}
+                    disabled={isReplayDisabled}
                 >
-                    <FontAwesomeIcon icon={faReply} className="mr-2" />
-                    最初から再生
+                    <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                    Replay
                 </button>
                 <button
-                    className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="
+                        py-2 
+                        px-4 
+                        bg-gray-800 
+                        text-white 
+                        font-semibold 
+                        rounded-lg 
+                        hover:bg-gray-600 
+                        focus:outline-none focus:ring-2 
+                        focus:ring-blue-500 
+                        focus:ring-opacity-50 
+                        flex 
+                        items-center 
+                        justify-center
+                    "
                     onClick={() => window.history.back()}
                 >
-                    <FontAwesomeIcon icon={faPenToSquare} className="mr-2" />
-                    新しく筆跡を残す
+                    <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                    Rewrite
                 </button>
                 <button
-                    className="py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="
+                        py-2 
+                        px-4 
+                        bg-gray-800 
+                        text-white 
+                        font-semibold 
+                        rounded-lg 
+                        hover:bg-gray-600 
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-blue-500 
+                        focus:ring-opacity-50
+                        flex 
+                        items-center 
+                        justify-center
+                    "
                     onClick={copyToClipboard}
                 >
-                    <FontAwesomeIcon icon={faPaste} className="mr-2" />
-                    筆跡を共有する
+                    <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                    Share
                 </button>
             </div>
         </div>
