@@ -128,7 +128,7 @@ const Playback: React.FC = () => {
 
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
-            <div className="whitespace-pre-wrap p-4 bg-gray-100 rounded-lg min-h-[200px]">
+            <div className="whitespace-pre-wrap p-4 rounded-lg">
                 {text}
             </div>
             <div className="mt-4 text-center">
