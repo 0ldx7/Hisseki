@@ -131,7 +131,7 @@ const TextRecorder: React.FC = () => {
                         flex 
                         items-center 
                         justify-center
-                    "
+                        "
                     onClick={saveRecords}
                     disabled={recordingStatus !== 'recording'}
                 >
