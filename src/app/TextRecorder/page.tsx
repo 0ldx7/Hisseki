@@ -102,7 +102,7 @@ const TextRecorder: React.FC = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 bg-gray-100 rounded-xl shadow-md">
             <textarea
                 className="w-full h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg"
                 value={text}
@@ -111,15 +111,14 @@ const TextRecorder: React.FC = () => {
                 disabled={recordingStatus === 'stopped'}
             />
             <div className="text-center">
-                <h4 className="text-lg mb-4">Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
+                <h4 className="text-lg mb-4 text-gray-700">Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
                 <button
                     className="
                         py-2 
                         px-6 
                         mb-4 
-                        m-auto 
-                        bg-gray-800 
-                        text-white
+                        bg-gray-900 
+                        text-white 
                         font-semibold 
                         rounded-lg 
                         hover:bg-gray-700 
@@ -131,14 +130,17 @@ const TextRecorder: React.FC = () => {
                         flex 
                         items-center 
                         justify-center
-                        "
+                        transition 
+                        duration-300 
+                        ease-in-out
+                    "
                     onClick={saveRecords}
                     disabled={recordingStatus !== 'recording'}
                 >
                     <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
                     筆跡を再生する
                 </button>
-                <ul className="list-disc list-inside text-left mx-auto max-w-md">
+                <ul className="list-disc list-inside text-left mx-auto max-w-md text-gray-700">
                     <li>文字数制限は500文字です。</li>
                     <li>タイマーが時間切れになると自動的に再生画面に遷移します。</li>
                     <li>入力した筆跡は共有URLで保存することができます。</li>

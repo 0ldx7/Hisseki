@@ -1,12 +1,11 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { diff_match_patch, patch_obj } from 'diff-match-patch';
+import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaste, faPenToSquare, faReply } from '@fortawesome/free-solid-svg-icons';
 import { logError } from '@/utils/errorHandler';
 
-// 入力レコードの型定義
 type InputRecord = {
     diffs: object[];
     timestamp: number;
@@ -125,8 +124,8 @@ const Playback: React.FC = () => {
     };
 
     return (
-        <div className="p-6 max-w-lg mx-auto bg-white text-gray-900 rounded-xl shadow-md space-y-4">
-            <div className="whitespace-pre-wrap p-4 rounded-lg">
+        <div className="p-6 max-w-lg mx-auto bg-gray-100 text-gray-900 rounded-xl shadow-md space-y-4">
+            <div className="whitespace-pre-wrap p-4 bg-gray-200 rounded-lg min-h-[200px] text-gray-700">
                 {isLoading || !initialPlaybackDone ? 'Loading...' : text}
             </div>
             <div className="mt-4 text-center">
@@ -137,11 +136,11 @@ const Playback: React.FC = () => {
                     className="
                         py-2
                         px-4
-                        bg-gray-800 
+                        bg-gray-900 
                         text-white 
                         font-semibold 
                         rounded-lg 
-                        hover:bg-gray-600 
+                        hover:bg-gray-700 
                         focus:outline-none 
                         focus:ring-2 
                         focus:ring-blue-500 
@@ -150,6 +149,9 @@ const Playback: React.FC = () => {
                         items-center 
                         justify-center 
                         disabled:bg-gray-400
+                        transition 
+                        duration-300 
+                        ease-in-out
                     "
                     onClick={() => playback(false)}
                     disabled={isReplayDisabled}
@@ -161,17 +163,21 @@ const Playback: React.FC = () => {
                     className="
                         py-2 
                         px-4 
-                        bg-gray-800 
+                        bg-gray-900 
                         text-white 
                         font-semibold 
                         rounded-lg 
-                        hover:bg-gray-600 
-                        focus:outline-none focus:ring-2 
+                        hover:bg-gray-700 
+                        focus:outline-none 
+                        focus:ring-2 
                         focus:ring-blue-500 
                         focus:ring-opacity-50 
                         flex 
                         items-center 
                         justify-center
+                        transition 
+                        duration-300 
+                        ease-in-out
                     "
                     onClick={() => window.history.back()}
                 >
@@ -182,11 +188,11 @@ const Playback: React.FC = () => {
                     className="
                         py-2 
                         px-4 
-                        bg-gray-800 
+                        bg-gray-900 
                         text-white 
                         font-semibold 
                         rounded-lg 
-                        hover:bg-gray-600 
+                        hover:bg-gray-700 
                         focus:outline-none 
                         focus:ring-2 
                         focus:ring-blue-500 
@@ -194,6 +200,9 @@ const Playback: React.FC = () => {
                         flex 
                         items-center 
                         justify-center
+                        transition 
+                        duration-300 
+                        ease-in-out
                     "
                     onClick={copyToClipboard}
                 >
