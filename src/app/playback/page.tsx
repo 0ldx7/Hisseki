@@ -15,21 +15,22 @@ type InputRecord = {
 const MIN_INTERVAL = 100;
 
 const Playback: React.FC = () => {
-    const [text, setText] = useState<string>(''); 
-    const [records, setRecords] = useState<InputRecord[]>([]); 
-    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null); 
-    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false); 
-    const [isLoading, setIsLoading] = useState<boolean>(true); 
-    const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false); 
-    const searchParams = useSearchParams(); 
+    const [text, setText] = useState<string>('');
+    const [records, setRecords] = useState<InputRecord[]>([]);
+    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null);
+    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false);
+    const [copyButtonText, setCopyButtonText] = useState<string>('Share'); // ボタンテキストのステートを追加
+    const searchParams = useSearchParams();
     const dmp = new diff_match_patch();
-    const lastUpdateRef = useRef<number>(Date.now()); 
-    const [shareLink, setShareLink] = useState<string>(''); 
+    const lastUpdateRef = useRef<number>(Date.now());
+    const [shareLink, setShareLink] = useState<string>('');
 
     const fetchRecords = async () => {
         const sessionId = searchParams.get('sessionId');
         if (!sessionId) {
-            logError('Session ID not found', null); 
+            logError('Session ID not found', null);
             return;
         }
 
@@ -39,25 +40,25 @@ const Playback: React.FC = () => {
                 const data: InputRecord[] = await response.json();
                 data.forEach((record, index) => {
                     if (record.timeDiff === undefined || record.timeDiff === 0) {
-                        data[index].timeDiff = 1000; 
+                        data[index].timeDiff = 1000;
                         console.log('TimeDiff is null or undefined');
                     }
                 });
-                setRecords(data); 
-                setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`); 
+                setRecords(data);
+                setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`);
                 const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
                 if (storedTime) {
-                    setInitialPlaybackTime(storedTime); 
+                    setInitialPlaybackTime(storedTime);
                 }
-                setIsLoading(false); 
+                setIsLoading(false);
             } else {
                 const errorData = await response.json();
-                logError('Failed to fetch records', errorData); 
-                setIsLoading(false); 
+                logError('Failed to fetch records', errorData);
+                setIsLoading(false);
             }
         } catch (error) {
-            logError('Error fetching records:', error); 
-            setIsLoading(false); 
+            logError('Error fetching records:', error);
+            setIsLoading(false);
         }
     };
 
@@ -66,42 +67,42 @@ const Playback: React.FC = () => {
     }, []);
 
     const playback = (isInitialPlayback: boolean, onPlaybackComplete?: () => void) => {
-        setIsReplayDisabled(true); 
-        let currentIndex = 0; 
-        let currentText = ''; 
+        setIsReplayDisabled(true);
+        let currentIndex = 0;
+        let currentText = '';
 
-        const sessionId = searchParams.get('sessionId'); 
+        const sessionId = searchParams.get('sessionId');
         if (!initialPlaybackTime && sessionId) {
-            const currentTime = new Date().toLocaleString(); 
-            localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime); 
-            setInitialPlaybackTime(currentTime); 
+            const currentTime = new Date().toLocaleString();
+            localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
+            setInitialPlaybackTime(currentTime);
         }
 
         const playNext = () => {
             if (currentIndex >= records.length) {
-                setIsReplayDisabled(false); 
+                setIsReplayDisabled(false);
                 if (onPlaybackComplete) onPlaybackComplete();
-                return; 
+                return;
             }
 
-            const record = records[currentIndex++]; 
-            const [newText, results] = dmp.patch_apply(record.diffs, currentText); 
+            const record = records[currentIndex++];
+            const [newText, results] = dmp.patch_apply(record.diffs, currentText);
 
             if (results.some(result => !result)) {
-                console.error('Patch application failed:', record.diffs, currentText); 
+                console.error('Patch application failed:', record.diffs, currentText);
             }
 
             if (!isInitialPlayback) {
-                setText(newText); 
+                setText(newText);
             }
-            currentText = newText; 
-            lastUpdateRef.current = Date.now(); 
+            currentText = newText;
+            lastUpdateRef.current = Date.now();
 
             const nextTimeDiff = isInitialPlayback ? MIN_INTERVAL : Math.max(records[currentIndex]?.timeDiff ?? 1000, MIN_INTERVAL);
-            setTimeout(playNext, nextTimeDiff); 
+            setTimeout(playNext, nextTimeDiff);
         };
 
-        playNext(); 
+        playNext();
     };
 
     useEffect(() => {
@@ -117,30 +118,34 @@ const Playback: React.FC = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(shareLink).then(() => {
-            alert('共有リンクをクリップボードにコピーしました'); 
+            setCopyButtonText('Copied!'); // ボタンテキストを変更
+            setTimeout(() => setCopyButtonText('Share'), 2000); // 2秒後に元のテキストに戻す
         }).catch(error => {
-            logError('リンクのコピーに失敗しました', error); 
+            logError('リンクのコピーに失敗しました', error);
         });
     };
 
     return (
-        <div className="p-6 max-w-lg mx-auto bg-gray-100 text-gray-900 rounded-xl shadow-md space-y-4">
-            <div className="whitespace-pre-wrap p-4 bg-gray-200 rounded-lg min-h-[200px] text-gray-700">
-                {isLoading || !initialPlaybackDone ? 'Loading...' : text}
+        <div className="p-6 max-w-lg mx-auto bg-white text-black rounded-lg space-y-4">
+            <div 
+                className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black animate-pulse"
+                style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
+                    {isLoading || !initialPlaybackDone ? 'Loading...' : text}
             </div>
-            <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600">{initialPlaybackTime}</p>
+            <div className="mt-4 text-right">
+                {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
                 <button
                     className="
                         py-2
                         px-4
-                        bg-gray-900 
+                        disabled:hover:bg-gray-800
+                        bg-gray-800 
                         text-white 
                         font-semibold 
                         rounded-lg 
-                        hover:bg-gray-700 
+                        hover:bg-gray-500 
                         focus:outline-none 
                         focus:ring-2 
                         focus:ring-blue-500 
@@ -148,10 +153,6 @@ const Playback: React.FC = () => {
                         flex 
                         items-center 
                         justify-center 
-                        disabled:bg-gray-400
-                        transition 
-                        duration-300 
-                        ease-in-out
                     "
                     onClick={() => playback(false)}
                     disabled={isReplayDisabled}
@@ -163,11 +164,11 @@ const Playback: React.FC = () => {
                     className="
                         py-2 
                         px-4 
-                        bg-gray-900 
+                        bg-gray-800 
                         text-white 
                         font-semibold 
                         rounded-lg 
-                        hover:bg-gray-700 
+                        hover:bg-gray-500 
                         focus:outline-none 
                         focus:ring-2 
                         focus:ring-blue-500 
@@ -175,9 +176,6 @@ const Playback: React.FC = () => {
                         flex 
                         items-center 
                         justify-center
-                        transition 
-                        duration-300 
-                        ease-in-out
                     "
                     onClick={() => window.history.back()}
                 >
@@ -188,11 +186,11 @@ const Playback: React.FC = () => {
                     className="
                         py-2 
                         px-4 
-                        bg-gray-900 
+                        bg-gray-800 
                         text-white 
                         font-semibold 
                         rounded-lg 
-                        hover:bg-gray-700 
+                        hover:bg-gray-500 
                         focus:outline-none 
                         focus:ring-2 
                         focus:ring-blue-500 
@@ -200,14 +198,11 @@ const Playback: React.FC = () => {
                         flex 
                         items-center 
                         justify-center
-                        transition 
-                        duration-300 
-                        ease-in-out
                     "
                     onClick={copyToClipboard}
                 >
                     <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                    Share
+                    {copyButtonText}
                 </button>
             </div>
         </div>
