@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
 import { logError } from '../../utils/errorHandler';
@@ -22,22 +22,28 @@ const TextRecorder: React.FC = () => {
     const [sessionId, setSessionId] = useState<string>(generateSessionId());
     const [timeLeft, setTimeLeft] = useState<number>(15 * 60);
     const [recordingStatus, setRecordingStatus] = useState<'notStarted' | 'recording' | 'stopped'>('notStarted');
+    const timerRef = useRef<NodeJS.Timeout | null>(null); // タイマーの参照を保持
     const dmp = new diff_match_patch();
     const router = useRouter();
 
     useEffect(() => {
         if (recordingStatus === 'recording') {
-            const timer = setInterval(() => {
+            timerRef.current = setInterval(() => {
                 setTimeLeft((prevTime) => {
                     if (prevTime <= 1) {
                         setRecordingStatus('stopped');
-                        clearInterval(timer);
+                        clearInterval(timerRef.current!);
                         location.reload();
                     }
                     return prevTime - 1;
                 });
             }, 1000);
         }
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+            }
+        };
     }, [recordingStatus]);
 
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -102,6 +108,18 @@ const TextRecorder: React.FC = () => {
         }
     };
 
+    const resetRecorder = () => {
+        setText('');
+        setLastText('');
+        setRecords([]);
+        setSessionId(generateSessionId());
+        setTimeLeft(15 * 60);
+        setRecordingStatus('notStarted');
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 bg-white rounded-lg">
             <textarea
@@ -117,17 +135,16 @@ const TextRecorder: React.FC = () => {
                     <button
                         className="
                             py-2 
-                            px-6 
+                            px-3
                             mt-2
                             mb-4 
                             m-auto 
                             bg-neutral-800 
                             text-white
                             font-semibold 
-                            rounded-lg 
                             hover:bg-neutral-600 
-                            focus:outline-none 
-                            focus:rin-neutral-600 
+                            focus:ring-blue-500 
+                            focus:ring-opacity-50
                             disabled:bg-neutral-600 
                             flex 
                             items-center 
@@ -142,32 +159,31 @@ const TextRecorder: React.FC = () => {
                     <button
                         className="
                             py-2 
-                            px-6 
+                            px-3
                             mt-2
                             mb-4 
                             m-auto 
                             bg-neutral-800 
                             text-white
                             font-semibold 
-                            rounded-lg 
                             hover:bg-neutral-600 
-                            focus:outline-none 
-                            focus:rin-neutral-600 
-                            disabled:bg-neutral-600 
+                            focus:ring-blue-500 
+                            focus:ring-opacity-50
                             flex 
                             items-center 
                             justify-center
                             "
-                        
+                        onClick={resetRecorder} // リセットボタンにクリックイベントハンドラを追加
                     >
                         <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
                         筆跡をリセット
                     </button>
                 </div>
-                <ul className="list-disc list-inside text-left mx-auto max-w-md">
+                <ul className="list-disc list-inside text-left mx-auto max-w-md tracking-wide">
+                    <li>別ページでアニメーションが再生されます。</li>
                     <li>文字数制限は500文字です。</li>
                     <li>タイマーが時間切れになると自動的に再生画面に遷移します。</li>
-                    <li>入力した筆跡は共有URLで保存することができます。</li>
+                    <li>入力した文章記録は共有URLで保存することができます。</li>
                 </ul>
             </div>
         </div>

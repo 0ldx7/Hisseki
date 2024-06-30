@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Concept: React.FC = () => {
     return (
-        <div className="my-5 p-4 bg-white rounded-lg text-black">
+        <div className="my-5 p-4 bg-white rounded-xl text-gray-900 tracking-wider">
             <p className="mb-4">
                 Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。<br />
                 文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。

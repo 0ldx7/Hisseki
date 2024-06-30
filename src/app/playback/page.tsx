@@ -127,13 +127,13 @@ const Playback: React.FC = () => {
 
     return (
         <div className="p-6 max-w-lg mx-auto bg-white text-black rounded-lg space-y-4">
+            <div className="mt-4 text-right">
+                {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
+            </div>
             <div 
                 className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black animate-pulse"
                 style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
                     {isLoading || !initialPlaybackDone ? 'Loading...' : text}
-            </div>
-            <div className="mt-4 text-right">
-                {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
                 <button
@@ -143,8 +143,7 @@ const Playback: React.FC = () => {
                         disabled:hover:bg-gray-800
                         bg-gray-800 
                         text-white 
-                        font-semibold 
-                        rounded-lg 
+                        font-semibold
                         hover:bg-gray-500 
                         focus:outline-none 
                         focus:ring-2 
@@ -167,7 +166,6 @@ const Playback: React.FC = () => {
                         bg-gray-800 
                         text-white 
                         font-semibold 
-                        rounded-lg 
                         hover:bg-gray-500 
                         focus:outline-none 
                         focus:ring-2 
@@ -189,7 +187,6 @@ const Playback: React.FC = () => {
                         bg-gray-800 
                         text-white 
                         font-semibold 
-                        rounded-lg 
                         hover:bg-gray-500 
                         focus:outline-none 
                         focus:ring-2 
