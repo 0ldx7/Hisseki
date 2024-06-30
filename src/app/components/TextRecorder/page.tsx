@@ -2,10 +2,11 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
-import { logError } from '../../utils/errorHandler';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons/faPlay';
 import { faEraser } from '@fortawesome/free-solid-svg-icons';
+import { logError } from '../../../utils/errorHandler';
+import Footer from '@/app/Footer';
 
 type InputRecord = {
     diffs: object[];
@@ -98,7 +99,7 @@ const TextRecorder: React.FC = () => {
 
             if (response.ok) {
                 console.log('Records saved successfully');
-                router.push(`/playback?sessionId=${sessionId}`);
+                router.push(`/components/Playback?sessionId=${sessionId}`);
             } else {
                 const errorData = await response.json();
                 logError('Failed to save records', errorData);
@@ -121,71 +122,74 @@ const TextRecorder: React.FC = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 bg-white rounded-lg">
-            <textarea
-                className="w-full h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg"
-                value={text}
-                onChange={handleInputChange}
-                maxLength={500}
-                disabled={recordingStatus === 'stopped'}
-            />
-            <div className="text-center">
-                <h4 className="text-md text-gray-600">Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
-                <div className="flex flex-col sm:flex-row items-center">
-                    <button
-                        className="
-                            py-2 
-                            px-3
-                            mt-2
-                            mb-4 
-                            m-auto 
-                            bg-neutral-800 
-                            text-white
-                            font-semibold 
-                            hover:bg-neutral-600 
-                            focus:ring-blue-500 
-                            focus:ring-opacity-50
-                            disabled:bg-neutral-600 
-                            flex 
-                            items-center 
-                            justify-center
-                            "
-                        onClick={saveRecords}
-                        disabled={recordingStatus !== 'recording'}
-                    >
-                        <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                        筆跡を再生する
-                    </button>
-                    <button
-                        className="
-                            py-2 
-                            px-3
-                            mt-2
-                            mb-4 
-                            m-auto 
-                            bg-neutral-800 
-                            text-white
-                            font-semibold 
-                            hover:bg-neutral-600 
-                            focus:ring-blue-500 
-                            focus:ring-opacity-50
-                            flex 
-                            items-center 
-                            justify-center
-                            "
-                        onClick={resetRecorder} // リセットボタンにクリックイベントハンドラを追加
-                    >
-                        <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                        筆跡をリセット
-                    </button>
+        <div className="flex flex-col min-h-screen text-black">
+            <div className='flex-grow flex flex-col items-center justify-center bg-gradient-to-b from-gray-300 to-white'>
+                <textarea
+                    className="w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg"
+                    value={text}
+                    onChange={handleInputChange}
+                    maxLength={500}
+                    disabled={recordingStatus === 'stopped'}
+                />
+                <div className="text-center">
+                    <h4 className="text-md text-gray-600">Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
+                    <div className="flex flex-col sm:flex-row items-center">
+                        <button
+                            className="
+                                py-2 
+                                px-3
+                                mt-2
+                                mb-4 
+                                m-auto 
+                                bg-neutral-800 
+                                text-white
+                                font-semibold 
+                                hover:bg-neutral-600 
+                                focus:ring-blue-500 
+                                focus:ring-opacity-50
+                                disabled:bg-neutral-600 
+                                flex 
+                                items-center 
+                                justify-center
+                                "
+                                onClick={saveRecords}
+                            disabled={recordingStatus !== 'recording'}
+                            >
+                            <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            筆跡を再生する
+                        </button>
+                        <button
+                            className="
+                                py-2 
+                                px-3
+                                mt-2
+                                mb-4 
+                                m-auto 
+                                bg-neutral-800 
+                                text-white
+                                font-semibold 
+                                hover:bg-neutral-600 
+                                focus:ring-blue-500 
+                                focus:ring-opacity-50
+                                flex 
+                                items-center 
+                                justify-center
+                                "
+                                onClick={resetRecorder} // リセットボタンにクリックイベントハンドラを追加
+                                >
+                            <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            筆跡をリセット
+                        </button>
+                    </div>
+                    <ul className="list-disc list-inside text-left mx-auto max-w-md tracking-wide">
+                        <li>別ページでアニメーションが再生されます。</li>
+                        <li>文字数制限は500文字です。</li>
+                        <li>タイマーが時間切れになると自動的に再生画面に遷移します。</li>
+                        <li>入力した文章は共有リンクから見返すことができます。</li>
+                    </ul>
                 </div>
-                <ul className="list-disc list-inside text-left mx-auto max-w-md tracking-wide">
-                    <li>別ページでアニメーションが再生されます。</li>
-                    <li>文字数制限は500文字です。</li>
-                    <li>タイマーが時間切れになると自動的に再生画面に遷移します。</li>
-                    <li>入力した文章記録は共有URLで保存することができます。</li>
-                </ul>
             </div>
+            <Footer />
         </div>
     );
 };

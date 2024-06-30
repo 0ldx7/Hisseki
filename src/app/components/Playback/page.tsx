@@ -5,6 +5,8 @@ import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaste, faPenToSquare, faReply } from '@fortawesome/free-solid-svg-icons';
 import { logError } from '@/utils/errorHandler';
+import Header from '@/app/Header';
+import Footer from '@/app/Footer';
 
 type InputRecord = {
     diffs: object[];
@@ -21,7 +23,7 @@ const Playback: React.FC = () => {
     const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false);
-    const [copyButtonText, setCopyButtonText] = useState<string>('Share'); // ボタンテキストのステートを追加
+    const [copyButtonText, setCopyButtonText] = useState<string>('リンクをコピー'); // ボタンテキストのステートを追加
     const searchParams = useSearchParams();
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now());
@@ -118,90 +120,94 @@ const Playback: React.FC = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(shareLink).then(() => {
-            setCopyButtonText('Copied!'); // ボタンテキストを変更
-            setTimeout(() => setCopyButtonText('Share'), 2000); // 2秒後に元のテキストに戻す
+            setCopyButtonText('URL is copied!'); // ボタンテキストを変更
+            setTimeout(() => setCopyButtonText('リンクをコピー'), 2000); // 2秒後に元のテキストに戻す
         }).catch(error => {
             logError('リンクのコピーに失敗しました', error);
         });
     };
 
     return (
-        <div className="p-6 max-w-lg mx-auto bg-white text-black rounded-lg space-y-4">
-            <div className="mt-4 text-right">
-                {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
+        <div className='flex flex-col min-h-screen relative'>
+            <Header />
+            <div className="flex-grow p-6 max-w-xl mx-auto bg-white text-black rounded-lg space-y-4">
+                <div className="mt-4 text-right">
+                    {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
+                </div>
+                <div 
+                    className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black animate-pulse"
+                    style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
+                        {isLoading || !initialPlaybackDone ? 'Loading...' : text}
+                </div>
+                <div className="flex flex-col p-2 sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button
+                        className="
+                            py-2
+                            px-4
+                            disabled:hover:bg-gray-800
+                            bg-gray-800 
+                            text-white 
+                            font-semibold
+                            hover:bg-gray-500 
+                            focus:outline-none 
+                            focus:ring-2 
+                            focus:ring-blue-500 
+                            focus:ring-opacity-50 
+                            flex 
+                            items-center 
+                            justify-center 
+                        "
+                        onClick={() => playback(false)}
+                        disabled={isReplayDisabled}
+                    >
+                        <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                        リプレイ
+                    </button>
+                    <button
+                        className="
+                            py-2 
+                            px-4 
+                            bg-gray-800 
+                            text-white 
+                            font-semibold 
+                            hover:bg-gray-500 
+                            focus:outline-none 
+                            focus:ring-2 
+                            focus:ring-blue-500 
+                            focus:ring-opacity-50 
+                            flex 
+                            items-center 
+                            justify-center
+                        "
+                        onClick={() => window.history.back()}
+                    >
+                        <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                        新しい筆跡を残す
+                    </button>
+                    <button
+                        className="
+                            py-2 
+                            px-4 
+                            bg-gray-800 
+                            text-white 
+                            font-semibold 
+                            hover:bg-gray-500 
+                            focus:outline-none 
+                            focus:ring-2 
+                            focus:ring-blue-500 
+                            focus:ring-opacity-50
+                            flex 
+                            items-center 
+                            justify-center
+                        "
+                        onClick={copyToClipboard}
+                    >
+                        <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                        {copyButtonText}
+                    </button>
+                </div>
             </div>
-            <div 
-                className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black animate-pulse"
-                style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
-                    {isLoading || !initialPlaybackDone ? 'Loading...' : text}
-            </div>
-            <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-                <button
-                    className="
-                        py-2
-                        px-4
-                        disabled:hover:bg-gray-800
-                        bg-gray-800 
-                        text-white 
-                        font-semibold
-                        hover:bg-gray-500 
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-blue-500 
-                        focus:ring-opacity-50 
-                        flex 
-                        items-center 
-                        justify-center 
-                    "
-                    onClick={() => playback(false)}
-                    disabled={isReplayDisabled}
-                >
-                    <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                    Replay
-                </button>
-                <button
-                    className="
-                        py-2 
-                        px-4 
-                        bg-gray-800 
-                        text-white 
-                        font-semibold 
-                        hover:bg-gray-500 
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-blue-500 
-                        focus:ring-opacity-50 
-                        flex 
-                        items-center 
-                        justify-center
-                    "
-                    onClick={() => window.history.back()}
-                >
-                    <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                    Rewrite
-                </button>
-                <button
-                    className="
-                        py-2 
-                        px-4 
-                        bg-gray-800 
-                        text-white 
-                        font-semibold 
-                        hover:bg-gray-500 
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-blue-500 
-                        focus:ring-opacity-50
-                        flex 
-                        items-center 
-                        justify-center
-                    "
-                    onClick={copyToClipboard}
-                >
-                    <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                    {copyButtonText}
-                </button>
-            </div>
+            <Footer />
         </div>
     );
 };

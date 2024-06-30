@@ -1,9 +1,9 @@
-import TextRecorder from './TextRecorder/page';
-import Concept from './Concept/page';
+import TextRecorder from './components/TextRecorder/page';
+import Concept from './components/Concept/page';
 
 export default function HomePage() {
     return (
-        <div>
+        <div className='relative min-h-screen'>
             <Concept />
             <TextRecorder />
         </div>
