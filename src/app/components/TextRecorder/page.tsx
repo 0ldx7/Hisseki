@@ -27,6 +27,7 @@ const TextRecorder: React.FC = () => {
     const dmp = new diff_match_patch();
     const router = useRouter();
 
+    // タイマーの管理
     useEffect(() => {
         if (recordingStatus === 'recording') {
             timerRef.current = setInterval(() => {
@@ -46,6 +47,11 @@ const TextRecorder: React.FC = () => {
             }
         };
     }, [recordingStatus]);
+
+    // ローカルストレージにデータを保存する関数
+    const saveToLocalStorage = (sessionId: string, records: InputRecord[]) => {
+        localStorage.setItem(sessionId, JSON.stringify(records));
+    };
 
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         if (recordingStatus === 'stopped') return;
@@ -81,6 +87,11 @@ const TextRecorder: React.FC = () => {
 
         setLastText(newText);
     };
+
+    // useEffectでrecordsが変更されるたびにローカルストレージに保存
+    useEffect(() => {
+        saveToLocalStorage(sessionId, records);
+    }, [records]);
 
     const saveRecords = async () => {
         if (records.length === 0) {
@@ -152,9 +163,9 @@ const TextRecorder: React.FC = () => {
                                 items-center 
                                 justify-center
                                 "
-                                onClick={saveRecords}
+                            onClick={saveRecords}
                             disabled={recordingStatus !== 'recording'}
-                            >
+                        >
                             <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
                             筆跡を再生する
                         </button>
@@ -175,8 +186,8 @@ const TextRecorder: React.FC = () => {
                                 items-center 
                                 justify-center
                                 "
-                                onClick={resetRecorder} // リセットボタンにクリックイベントハンドラを追加
-                                >
+                            onClick={resetRecorder} // リセットボタンにクリックイベントハンドラを追加
+                        >
                             <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
                             筆跡をリセット
                         </button>

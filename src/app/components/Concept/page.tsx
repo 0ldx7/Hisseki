@@ -1,7 +1,31 @@
-import Header from '@/app/Header';
-import React from 'react';
+"use client";
 
-export const Concept: React.FC = () => {
+import Header from '@/app/Header';
+import React, { useEffect, useState, useRef } from 'react';
+import { fetchRecords, playback } from '@/utils/conceptPlayback';
+
+type InputRecord = {
+    diffs: any;
+    timestamp: number;
+    timeDiff: number;
+};
+
+const Concept: React.FC = () => {
+    const [text, setText] = useState<string>('');
+    const [records, setRecords] = useState<InputRecord[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const lastUpdateRef = useRef<number>(Date.now());
+
+    useEffect(() => {
+        fetchRecords(setRecords, setIsLoading);
+    }, []);
+
+    useEffect(() => {
+        if (records.length > 0 && !isLoading) {
+            playback(records, setText, lastUpdateRef);
+        }
+    }, [records, isLoading]);
+
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-300">
             <Header />
@@ -16,6 +40,11 @@ export const Concept: React.FC = () => {
                 <li>ポエミーなときの独り言</li>
                 <li>誰かに向けたメッセージ</li>
             </ul>
+            <div 
+                className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black animate-pulse"
+                style={isLoading ? { opacity: 0 } : { opacity: 1 }}>
+                {isLoading ? 'Loading...' : text}
+            </div>
         </div>
     );
 };

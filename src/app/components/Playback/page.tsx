@@ -9,7 +9,7 @@ import Header from '@/app/Header';
 import Footer from '@/app/Footer';
 
 type InputRecord = {
-    diffs: object[];
+    diffs: any;
     timestamp: number;
     timeDiff: number;
 };
@@ -23,7 +23,7 @@ const Playback: React.FC = () => {
     const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false);
-    const [copyButtonText, setCopyButtonText] = useState<string>('リンクをコピー'); // ボタンテキストのステートを追加
+    const [copyButtonText, setCopyButtonText] = useState<string>('リンクをコピー');
     const searchParams = useSearchParams();
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now());
@@ -120,11 +120,55 @@ const Playback: React.FC = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(shareLink).then(() => {
-            setCopyButtonText('URL is copied!'); // ボタンテキストを変更
-            setTimeout(() => setCopyButtonText('リンクをコピー'), 2000); // 2秒後に元のテキストに戻す
+            setCopyButtonText('URL is copied!');
+            setTimeout(() => setCopyButtonText('リンクをコピー'), 2000);
         }).catch(error => {
             logError('リンクのコピーに失敗しました', error);
         });
+    };
+
+    // ローカルストレージからデータを取得する関数
+    const getFromLocalStorage = (sessionId: string): InputRecord[] => {
+        const storedData = localStorage.getItem(sessionId);
+        return storedData ? JSON.parse(storedData) : [];
+    };
+
+    // DBにデータをPOSTする関数
+    const saveToDatabase = async (sessionId: string, records: InputRecord[]) => {
+        try {
+            const response = await fetch('/api/saveRecords', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sessionId, records })
+            });
+
+            if (response.ok) {
+                console.log('Records saved successfully');
+            } else {
+                const errorData = await response.json();
+                logError('Failed to save records', errorData);
+            }
+        } catch (error) {
+            logError('An unexpected error occurred', error);
+        }
+    };
+
+    // 共有リンクボタンのクリックイベントに紐付ける関数
+    const handleCopyAndSave = async () => {
+        const sessionId = searchParams.get('sessionId');
+        if (!sessionId) {
+            logError('Session ID not found', null);
+            return;
+        }
+
+        const records = getFromLocalStorage(sessionId);
+        if (records.length > 0) {
+            await saveToDatabase(sessionId, records);
+        }
+
+        copyToClipboard();
     };
 
     return (
@@ -134,10 +178,10 @@ const Playback: React.FC = () => {
                 <div className="mt-4 text-right">
                     {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
                 </div>
-                <div 
-                    className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black animate-pulse"
+                <div
+                    className={`whitespace-pre-wrap p-4 rounded-lg bg-white text-black ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
                     style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
-                        {isLoading || !initialPlaybackDone ? 'Loading...' : text}
+                    {isLoading || !initialPlaybackDone ? 'Loading...' : text}
                 </div>
                 <div className="flex flex-col p-2 sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
                     <button
@@ -200,7 +244,7 @@ const Playback: React.FC = () => {
                             items-center 
                             justify-center
                         "
-                        onClick={copyToClipboard}
+                        onClick={handleCopyAndSave}
                     >
                         <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
                         {copyButtonText}
