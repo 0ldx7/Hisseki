@@ -7,6 +7,7 @@ import { faPaste, faPenToSquare, faReply } from '@fortawesome/free-solid-svg-ico
 import { logError } from '@/utils/errorHandler';
 import Header from '@/app/Header';
 import Footer from '@/app/Footer';
+import Link from 'next/link';
 
 type InputRecord = {
     diffs: any;
@@ -15,6 +16,8 @@ type InputRecord = {
 };
 
 const MIN_INTERVAL = 100;
+
+const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
 
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
@@ -29,13 +32,12 @@ const Playback: React.FC = () => {
     const lastUpdateRef = useRef<number>(Date.now());
     const [shareLink, setShareLink] = useState<string>('');
 
-    const fetchRecords = async () => {
-        const sessionId = searchParams.get('sessionId');
-        if (!sessionId) {
-            logError('Session ID not found', null);
-            return;
-        }
+    const fetchRecordsFromLocalStorage = (): InputRecord[] => {
+        const storedData = localStorage.getItem('records');
+        return storedData ? JSON.parse(storedData) : [];
+    };
 
+    const fetchRecordsFromDatabase = async (sessionId: string): Promise<InputRecord[]> => {
         try {
             const response = await fetch(`/api/getRecords?sessionId=${sessionId}`);
             if (response.ok) {
@@ -46,21 +48,47 @@ const Playback: React.FC = () => {
                         console.log('TimeDiff is null or undefined');
                     }
                 });
-                setRecords(data);
-                setShareLink(`${window.location.origin}/playback?sessionId=${sessionId}`);
-                const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
-                if (storedTime) {
-                    setInitialPlaybackTime(storedTime);
-                }
-                setIsLoading(false);
+                return data;
             } else {
                 const errorData = await response.json();
                 logError('Failed to fetch records', errorData);
-                setIsLoading(false);
+                return [];
             }
         } catch (error) {
             logError('Error fetching records:', error);
-            setIsLoading(false);
+            return [];
+        }
+    };
+
+    const fetchRecords = async () => {
+        const sessionId = searchParams.get('sessionId');
+
+        let data: InputRecord[] = [];
+        if (sessionId) {
+            data = await fetchRecordsFromDatabase(sessionId);
+        } else {
+            data = fetchRecordsFromLocalStorage();
+        }
+
+        setRecords(data);
+
+        if (sessionId) {
+            setShareLink(`${window.location.origin}/components/Playback?sessionId=${sessionId}`);
+            const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
+            if (storedTime) {
+                setInitialPlaybackTime(storedTime);
+            }
+        }
+
+        setIsLoading(false);
+
+        // ローディング終了後の時刻をinitialPlaybackTimeとして設定
+        const currentTime = new Date().toLocaleString();
+        if (!initialPlaybackTime) {
+            setInitialPlaybackTime(currentTime);
+            if (sessionId) {
+                localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
+            }
         }
     };
 
@@ -72,13 +100,6 @@ const Playback: React.FC = () => {
         setIsReplayDisabled(true);
         let currentIndex = 0;
         let currentText = '';
-
-        const sessionId = searchParams.get('sessionId');
-        if (!initialPlaybackTime && sessionId) {
-            const currentTime = new Date().toLocaleString();
-            localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
-            setInitialPlaybackTime(currentTime);
-        }
 
         const playNext = () => {
             if (currentIndex >= records.length) {
@@ -118,22 +139,16 @@ const Playback: React.FC = () => {
         }
     }, [records, isLoading]);
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(shareLink).then(() => {
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(shareLink);
             setCopyButtonText('URL is copied!');
             setTimeout(() => setCopyButtonText('リンクをコピー'), 2000);
-        }).catch(error => {
+        } catch (error) {
             logError('リンクのコピーに失敗しました', error);
-        });
+        }
     };
 
-    // ローカルストレージからデータを取得する関数
-    const getFromLocalStorage = (sessionId: string): InputRecord[] => {
-        const storedData = localStorage.getItem(sessionId);
-        return storedData ? JSON.parse(storedData) : [];
-    };
-
-    // DBにデータをPOSTする関数
     const saveToDatabase = async (sessionId: string, records: InputRecord[]) => {
         try {
             const response = await fetch('/api/saveRecords', {
@@ -155,28 +170,31 @@ const Playback: React.FC = () => {
         }
     };
 
-    // 共有リンクボタンのクリックイベントに紐付ける関数
     const handleCopyAndSave = async () => {
-        const sessionId = searchParams.get('sessionId');
-        if (!sessionId) {
-            logError('Session ID not found', null);
-            return;
-        }
-
-        const records = getFromLocalStorage(sessionId);
+        const sessionId = generateSessionId();
+        const records = fetchRecordsFromLocalStorage();
         if (records.length > 0) {
             await saveToDatabase(sessionId, records);
         }
-
-        copyToClipboard();
+    
+        const newShareLink = `${window.location.origin}/components/Playback?sessionId=${sessionId}`;
+        setShareLink(newShareLink);
+        localStorage.setItem(`initialPlaybackTime-${sessionId}`, new Date().toLocaleString());
     };
+    
+    useEffect(() => {
+        if (shareLink) {
+            copyToClipboard();
+        }
+    }, [shareLink]);
+    
 
     return (
         <div className='flex flex-col min-h-screen relative'>
             <Header />
             <div className="flex-grow p-6 max-w-xl mx-auto bg-white text-black rounded-lg space-y-4">
                 <div className="mt-4 text-right">
-                    {initialPlaybackDone && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
+                    {initialPlaybackDone && initialPlaybackTime && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
                 </div>
                 <div
                     className={`whitespace-pre-wrap p-4 rounded-lg bg-white text-black ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
@@ -207,27 +225,29 @@ const Playback: React.FC = () => {
                         <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
                         リプレイ
                     </button>
-                    <button
-                        className="
+                    <Link href="/">
+                        <button
+                            className="
                             py-2 
                             px-4 
                             bg-gray-800 
-                            text-white 
-                            font-semibold 
-                            hover:bg-gray-500 
-                            focus:outline-none 
-                            focus:ring-2 
-                            focus:ring-blue-500 
-                            focus:ring-opacity-50 
-                            flex 
-                            items-center 
-                            justify-center
-                        "
-                        onClick={() => window.history.back()}
-                    >
-                        <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                        新しい筆跡を残す
-                    </button>
+                                text-white 
+                                font-semibold 
+                                hover:bg-gray-500 
+                                focus:outline-none 
+                                focus:ring-2 
+                                focus:ring-blue-500 
+                                focus:ring-opacity-50 
+                                flex 
+                                items-center 
+                                justify-center
+                                "
+                                // onClick={() => window.history.back()}
+                                >
+                            <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            新しい筆跡を残す
+                        </button>
+                    </Link>
                     <button
                         className="
                             py-2 

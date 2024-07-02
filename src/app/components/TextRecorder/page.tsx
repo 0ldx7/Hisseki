@@ -3,9 +3,7 @@ import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay } from '@fortawesome/free-solid-svg-icons/faPlay';
-import { faEraser } from '@fortawesome/free-solid-svg-icons';
-import { logError } from '../../../utils/errorHandler';
+import { faPlay, faEraser } from '@fortawesome/free-solid-svg-icons';
 import Footer from '@/app/Footer';
 
 type InputRecord = {
@@ -14,20 +12,16 @@ type InputRecord = {
     timeDiff: number;
 };
 
-const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
-
 const TextRecorder: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [lastText, setLastText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
-    const [sessionId, setSessionId] = useState<string>(generateSessionId());
     const [timeLeft, setTimeLeft] = useState<number>(15 * 60);
     const [recordingStatus, setRecordingStatus] = useState<'notStarted' | 'recording' | 'stopped'>('notStarted');
-    const timerRef = useRef<NodeJS.Timeout | null>(null); // タイマーの参照を保持
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
     const dmp = new diff_match_patch();
     const router = useRouter();
 
-    // タイマーの管理
     useEffect(() => {
         if (recordingStatus === 'recording') {
             timerRef.current = setInterval(() => {
@@ -48,9 +42,8 @@ const TextRecorder: React.FC = () => {
         };
     }, [recordingStatus]);
 
-    // ローカルストレージにデータを保存する関数
-    const saveToLocalStorage = (sessionId: string, records: InputRecord[]) => {
-        localStorage.setItem(sessionId, JSON.stringify(records));
+    const saveToLocalStorage = (records: InputRecord[]) => {
+        localStorage.setItem('records', JSON.stringify(records));
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -75,56 +68,28 @@ const TextRecorder: React.FC = () => {
         const timeDiff = records.length > 0 ? currentTime - records[records.length - 1].timestamp : 0;
 
         if (records.length < 1500) {
-            setRecords((prevRecords) => [
-                ...prevRecords,
-                { diffs: patches, timestamp: currentTime, timeDiff }
-            ]);
+            setRecords((prevRecords) => {
+                const updatedRecords = [
+                    ...prevRecords,
+                    { diffs: patches, timestamp: currentTime, timeDiff }
+                ];
+                saveToLocalStorage(updatedRecords);
+                return updatedRecords;
+            });
         }
 
         if (records.length > 1500) {
             location.reload();
-        };
+        }
 
         setLastText(newText);
-    };
-
-    // useEffectでrecordsが変更されるたびにローカルストレージに保存
-    useEffect(() => {
-        saveToLocalStorage(sessionId, records);
-    }, [records]);
-
-    const saveRecords = async () => {
-        if (records.length === 0) {
-            logError('No records to save', null);
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/saveRecords', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ sessionId, records })
-            });
-
-            if (response.ok) {
-                console.log('Records saved successfully');
-                router.push(`/components/Playback?sessionId=${sessionId}`);
-            } else {
-                const errorData = await response.json();
-                logError('Failed to save records', errorData);
-            }
-        } catch (error) {
-            logError('An unexpected error occurred', error);
-        }
     };
 
     const resetRecorder = () => {
         setText('');
         setLastText('');
         setRecords([]);
-        setSessionId(generateSessionId());
+        localStorage.removeItem('records');
         setTimeLeft(15 * 60);
         setRecordingStatus('notStarted');
         if (timerRef.current) {
@@ -133,8 +98,8 @@ const TextRecorder: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen text-black">
-            <div className='flex-grow flex flex-col items-center justify-center bg-gradient-to-b from-gray-300 to-white'>
+        <div className="sticky top-0 h-screen flex flex-col min-h-screen text-black">
+            <div className='flex-grow flex flex-col items-center justify-center bg-white'>
                 <textarea
                     className="w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg"
                     value={text}
@@ -163,7 +128,7 @@ const TextRecorder: React.FC = () => {
                                 items-center 
                                 justify-center
                                 "
-                            onClick={saveRecords}
+                            onClick={() => router.push('/components/Playback')}
                             disabled={recordingStatus !== 'recording'}
                         >
                             <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
@@ -186,7 +151,7 @@ const TextRecorder: React.FC = () => {
                                 items-center 
                                 justify-center
                                 "
-                            onClick={resetRecorder} // リセットボタンにクリックイベントハンドラを追加
+                            onClick={resetRecorder}
                         >
                             <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
                             筆跡をリセット

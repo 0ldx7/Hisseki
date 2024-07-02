@@ -12,7 +12,7 @@ type InputRecord = {
 };
 
 const MIN_INTERVAL = 100;
-const DEMO_SESSION_ID = '_7l5mifu8n'; // デモ用のセッションIDを指定
+const DEMO_SESSION_ID = '_5vc66v43d'; // デモ用のセッションIDを指定
 
 const Concept: React.FC = () => {
     const [text, setText] = useState<string>('');
@@ -90,7 +90,7 @@ const Concept: React.FC = () => {
     }, [records]);
 
     return (
-        <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-300">
+        <div className="sticky top-0 h-screen flex flex-col items-center justify-center bg-white">
             <Header />
             <div className="m-10 text-center">
                 <p>
