@@ -190,9 +190,8 @@ const Playback: React.FC = () => {
     
 
     return (
-        <div className='flex flex-col min-h-screen relative'>
-            <Header />
-            <div className="flex-grow p-6 max-w-xl mx-auto bg-white text-black rounded-lg space-y-4">
+        <div className='flex flex-col min-h-screen relative bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
+            <div className="flex-grow p-6 max-w-xl mx-auto text-black rounded-lg space-y-4">
                 <div className="mt-4 text-right">
                     {initialPlaybackDone && initialPlaybackTime && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
                 </div>
@@ -201,24 +200,20 @@ const Playback: React.FC = () => {
                     style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
                     {isLoading || !initialPlaybackDone ? 'Loading...' : text}
                 </div>
-                <div className="flex flex-col p-2 sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                     <button
                         className="
-                            py-2
+                            py-2 
                             px-4
-                            disabled:hover:bg-gray-800
-                            bg-gray-800 
-                            text-white 
-                            font-semibold
-                            hover:bg-gray-500 
-                            focus:outline-none 
-                            focus:ring-2 
+                            text-neutral-600
+                            border-2
+                            border-neutral-600
+                            hover:bg-neutral-200 
                             focus:ring-blue-500 
-                            focus:ring-opacity-50 
-                            flex 
-                            items-center 
-                            justify-center 
-                        "
+                            focus:ring-opacity-50
+                            flex
+                            items-center
+                            justify-center"
                         onClick={() => playback(false)}
                         disabled={isReplayDisabled}
                     >
@@ -228,22 +223,18 @@ const Playback: React.FC = () => {
                     <Link href="/">
                         <button
                             className="
-                            py-2 
-                            px-4 
-                            bg-gray-800 
-                                text-white 
-                                font-semibold 
-                                hover:bg-gray-500 
-                                focus:outline-none 
-                                focus:ring-2 
+                                py-2 
+                                px-4
+                                text-neutral-600
+                                border-2
+                                border-neutral-600
+                                hover:bg-neutral-200 
                                 focus:ring-blue-500 
-                                focus:ring-opacity-50 
-                                flex 
-                                items-center 
-                                justify-center
-                                "
-                                // onClick={() => window.history.back()}
-                                >
+                                focus:ring-opacity-50
+                                flex
+                                items-center
+                                justify-center"
+                        >
                             <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
                             新しい筆跡を残す
                         </button>
@@ -251,19 +242,16 @@ const Playback: React.FC = () => {
                     <button
                         className="
                             py-2 
-                            px-4 
-                            bg-gray-800 
-                            text-white 
-                            font-semibold 
-                            hover:bg-gray-500 
-                            focus:outline-none 
-                            focus:ring-2 
+                            px-4
+                            text-neutral-600
+                            border-2
+                            border-neutral-600
+                            hover:bg-neutral-200 
                             focus:ring-blue-500 
                             focus:ring-opacity-50
-                            flex 
-                            items-center 
-                            justify-center
-                        "
+                            flex
+                            items-center
+                            justify-center"
                         onClick={handleCopyAndSave}
                     >
                         <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />

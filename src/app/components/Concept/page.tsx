@@ -12,7 +12,8 @@ type InputRecord = {
 };
 
 const MIN_INTERVAL = 100;
-const DEMO_SESSION_ID = '_5vc66v43d'; // デモ用のセッションIDを指定
+const DEMO_SESSION_ID = '_najykuhsq'; // デモ用のセッションIDを指定
+
 
 const Concept: React.FC = () => {
     const [text, setText] = useState<string>('');
@@ -90,25 +91,32 @@ const Concept: React.FC = () => {
     }, [records]);
 
     return (
-        <div className="sticky top-0 h-screen flex flex-col items-center justify-center bg-white">
+        <div className="h-screen flex flex-col items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
             <Header />
             <div className="m-10 text-center">
                 <p>
                     Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。<br />
                     文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。<br />
                 </p>
-                <div className="whitespace-pre-wrap p-4 rounded-lg bg-white text-black mt-4">
-                    {text}
+            </div>
+            <div className='relative'>
+                <p className='text-center'>
+                    個人的な日記、小説や詩、ポエミーなときの独り言など、<br />
+                    書く物は何でも構いません。<br />
+                    あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。
+                </p>
+                {/* <ul className="min-w-20 list-none list-inside space-y-2 text-left">
+                    <li>個人的な日記</li>
+                    <li>詩や小説</li>
+                    <li>深い内省や思考の観察</li>
+                    <li>ポエミーなときの独り言</li>
+                    <li>誰かに向けたメッセージ</li>
+                </ul> */}
+                <div className="absolute top-0 whitespace-pre-wrap min-w-fit rounded-lg text-gray-400 mt-4 text-xl text-left">
+                    {/* {text} */}
                 </div>
             </div>
-            <ul className="p-12 list-none list-inside space-y-2">
-                <li>個人的な日記</li>
-                <li>詩や小説</li>
-                <li>深い内省や思考の観察</li>
-                <li>ポエミーなときの独り言</li>
-                <li>誰かに向けたメッセージ</li>
-            </ul>
-        </div>
+        </div>      
     );
 };
 

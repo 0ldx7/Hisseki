@@ -98,8 +98,8 @@ const TextRecorder: React.FC = () => {
     };
 
     return (
-        <div className="sticky top-0 h-screen flex flex-col min-h-screen text-black">
-            <div className='flex-grow flex flex-col items-center justify-center bg-white'>
+        <div className="h-screen flex flex-col min-h-screen text-black bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
+            <div className='flex-grow flex flex-col items-center justify-center'>
                 <textarea
                     className="w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg"
                     value={text}
@@ -112,18 +112,21 @@ const TextRecorder: React.FC = () => {
                     <div className="flex flex-col sm:flex-row items-center">
                         <button
                             className="
-                                py-2 
+                                py-2
                                 px-3
                                 mt-2
                                 mb-4 
                                 m-auto 
-                                bg-neutral-800 
                                 text-white
-                                font-semibold 
+                                font-light
+                                border-2
+                                bg-neutral-800 
+                                border-neutral-800
                                 hover:bg-neutral-600 
                                 focus:ring-blue-500 
                                 focus:ring-opacity-50
                                 disabled:bg-neutral-600 
+                                disabled:border-neutral-600 
                                 flex 
                                 items-center 
                                 justify-center
@@ -141,14 +144,14 @@ const TextRecorder: React.FC = () => {
                                 mt-2
                                 mb-4 
                                 m-auto 
-                                bg-neutral-800 
-                                text-white
-                                font-semibold 
-                                hover:bg-neutral-600 
+                                text-neutral-600
+                                border-2
+                                border-neutral-600
+                                hover:bg-neutral-200 
                                 focus:ring-blue-500 
                                 focus:ring-opacity-50
-                                flex 
-                                items-center 
+                                flex
+                                items-center
                                 justify-center
                                 "
                             onClick={resetRecorder}
@@ -157,10 +160,10 @@ const TextRecorder: React.FC = () => {
                             筆跡をリセット
                         </button>
                     </div>
-                    <ul className="list-disc list-inside text-left mx-auto max-w-md tracking-wide">
+                    <ul className="list-disc list-inside text-left mx-auto max-w-lg tracking-wide">
                         <li>別ページでアニメーションが再生されます。</li>
                         <li>文字数制限は500文字です。</li>
-                        <li>タイマーが時間切れになると自動的に再生画面に遷移します。</li>
+                        <li>タイマーが時間切れになると自動的に再生を開始します。</li>
                         <li>入力した文章は共有リンクから見返すことができます。</li>
                     </ul>
                 </div>

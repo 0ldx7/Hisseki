@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${MPlus1p.className} flex flex-col min-h-screen bg-white text-black`}>
-        <main className="container mx-auto">
+        <main>
         {/* p-4 sm:p-6 lg:p-8 */}
           {children}
         </main>
