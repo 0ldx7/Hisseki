@@ -12,7 +12,7 @@ type InputRecord = {
 };
 
 const MIN_INTERVAL = 100;
-const DEMO_SESSION_ID = '_najykuhsq'; // デモ用のセッションIDを指定
+const DEMO_SESSION_ID = '_n5hulccn0'; // デモ用のセッションIDを指定
 
 
 const Concept: React.FC = () => {
@@ -91,7 +91,7 @@ const Concept: React.FC = () => {
     }, [records]);
 
     return (
-        <div className="h-screen flex flex-col items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
+        <div className="h-screen items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
             <Header />
             <div className="mt-14 text-center">
                 <p className='pb-4'>Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。</p>
@@ -100,17 +100,8 @@ const Concept: React.FC = () => {
             <div className='mt-10 relative text-center'>
                 <p className='text-center pb-4'>個人的な日記、小説や詩、ポエミーなときの独り言など、</p>
                 <p className='pb-14'>書く物は何でも構いません。</p>
-                <p>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
-                {/* <ul className="min-w-20 list-none list-inside space-y-2 text-left">
-                    <li>個人的な日記</li>
-                    <li>詩や小説</li>
-                    <li>深い内省や思考の観察</li>
-                    <li>ポエミーなときの独り言</li>
-                    <li>誰かに向けたメッセージ</li>
-                </ul> */}
-                <div className="absolute top-0 whitespace-pre-wrap min-w-fit rounded-lg text-gray-400 mt-4 text-xl text-left">
-                    {/* {text} */}
-                </div>
+                <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
+                {/* <p className='tracking-wide'>{text}</p> */}
             </div>
         </div>      
     );

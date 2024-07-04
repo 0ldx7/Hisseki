@@ -196,68 +196,76 @@ const Playback: React.FC = () => {
                     {initialPlaybackDone && initialPlaybackTime && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
                 </div>
                 <div
-                    className={`whitespace-pre-wrap p-4 rounded-lg bg-white text-black ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
+                    className={`whitespace-pre-wrap p-4 rounded-lg tracking-wide text-lg text-black ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
                     style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
                     {isLoading || !initialPlaybackDone ? 'Loading...' : text}
                 </div>
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                     <button
                         className="
-                            py-2 
+                            group
+                            py-3
                             px-4
-                            text-neutral-600
-                            border-2
-                            border-neutral-600
-                            hover:bg-neutral-200 
+                            mt-2
+                            mb-4 
+                            m-auto 
+                            text-neutral-700
+                            font-light
+                            bg-neutral-200
                             focus:ring-blue-500 
                             focus:ring-opacity-50
-                            flex
-                            items-center
-                            justify-center
-                            disabled:bg-neutral-200 
                             "
                         onClick={() => playback(false)}
                         disabled={isReplayDisabled}
                     >
-                        <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                        リプレイ
+                        <div className='inline-flex items-center'>
+                            <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            リプレイ
+                        </div>
+                        <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500 group-disabled:w-0"></div>
                     </button>
                     <Link href="/">
                         <button
                             className="
-                                py-2 
+                                group
+                                py-3
                                 px-4
-                                text-neutral-600
-                                border-2
-                                border-neutral-600
-                                hover:bg-neutral-200 
+                                mt-2
+                                mb-4 
+                                font-light
+                                text-neutral-700
+                                m-auto
                                 focus:ring-blue-500 
-                                focus:ring-opacity-50
-                                flex
-                                items-center
-                                justify-center"
+                                bg-neutral-200 
+                                "
                         >
-                            <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                            新しい筆跡を残す
+                            <div className='inline-flex items-center'>
+                                <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                                新しい筆跡を残す
+                            </div>
+                            <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500"></div>
                         </button>
                     </Link>
                     <button
                         className="
-                            py-2 
+                            group
+                            py-3
                             px-4
-                            text-neutral-600
-                            border-2
-                            border-neutral-600
-                            hover:bg-neutral-200 
+                            mt-2
+                            mb-4 
+                            font-light
+                            text-neutral-700
+                            m-auto
                             focus:ring-blue-500 
-                            focus:ring-opacity-50
-                            flex
-                            items-center
-                            justify-center"
+                            bg-neutral-200 
+                            "
                         onClick={handleCopyAndSave}
                     >
-                        <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                        {copyButtonText}
+                        <div className='inline-flex items-center'>
+                            <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            {copyButtonText}
+                        </div>
+                        <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500"></div>
                     </button>
                 </div>
             </div>

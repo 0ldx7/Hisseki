@@ -112,52 +112,47 @@ const TextRecorder: React.FC = () => {
                     <div className="flex flex-col sm:flex-row items-center">
                         <button
                             className="
-                                py-2
-                                px-3
+                                group
+                                py-3
+                                px-4
                                 mt-2
                                 mb-4 
                                 m-auto 
                                 text-white
                                 font-light
-                                border-2
-                                bg-neutral-800 
-                                border-neutral-800
-                                hover:bg-neutral-600 
+                                bg-neutral-700
                                 focus:ring-blue-500 
                                 focus:ring-opacity-50
-                                disabled:bg-neutral-600 
-                                disabled:border-neutral-600 
-                                flex 
-                                items-center 
-                                justify-center
                                 "
                             onClick={() => router.push('/components/Playback')}
                             disabled={recordingStatus !== 'recording'}
                         >
-                            <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                            筆跡を再生する
+                            <div className='inline-flex items-center'>
+                                <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                                筆跡を再生する
+                            </div>
+                            <div className='bg-white h-[2px] w-0 group-hover:w-full transition-all duration-500 group-disabled:w-0'></div>
                         </button>
                         <button
                             className="
-                                py-2 
-                                px-3
+                                group
+                                py-3
+                                px-4
                                 mt-2
                                 mb-4 
-                                m-auto 
-                                text-neutral-600
-                                border-2
-                                border-neutral-600
-                                hover:bg-neutral-200 
+                                font-light
+                                text-neutral-700
+                                m-auto
                                 focus:ring-blue-500 
-                                focus:ring-opacity-50
-                                flex
-                                items-center
-                                justify-center
+                                bg-neutral-200 
                                 "
                             onClick={resetRecorder}
                         >
-                            <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
-                            筆跡をリセット
+                            <div className='inline-flex items-center'>
+                                <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                                筆跡をリセット
+                            </div>
+                            <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500"></div>
                         </button>
                     </div>
                     <ul className="list-disc list-inside text-left mx-auto max-w-lg tracking-wide">
