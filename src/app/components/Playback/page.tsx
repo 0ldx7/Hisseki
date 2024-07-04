@@ -213,7 +213,9 @@ const Playback: React.FC = () => {
                             focus:ring-opacity-50
                             flex
                             items-center
-                            justify-center"
+                            justify-center
+                            disabled:bg-neutral-200 
+                            "
                         onClick={() => playback(false)}
                         disabled={isReplayDisabled}
                     >

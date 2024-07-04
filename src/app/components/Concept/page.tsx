@@ -93,18 +93,14 @@ const Concept: React.FC = () => {
     return (
         <div className="h-screen flex flex-col items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
             <Header />
-            <div className="m-10 text-center">
-                <p>
-                    Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。<br />
-                    文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。<br />
-                </p>
+            <div className="mt-14 text-center">
+                <p className='pb-4'>Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。</p>
+                <p className='pb-4'>文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。</p>
             </div>
-            <div className='relative'>
-                <p className='text-center'>
-                    個人的な日記、小説や詩、ポエミーなときの独り言など、<br />
-                    書く物は何でも構いません。<br />
-                    あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。
-                </p>
+            <div className='mt-10 relative text-center'>
+                <p className='text-center pb-4'>個人的な日記、小説や詩、ポエミーなときの独り言など、</p>
+                <p className='pb-14'>書く物は何でも構いません。</p>
+                <p>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
                 {/* <ul className="min-w-20 list-none list-inside space-y-2 text-left">
                     <li>個人的な日記</li>
                     <li>詩や小説</li>
