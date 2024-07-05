@@ -17,4 +17,8 @@ const config: Config = {
   },
   plugins: [],
 };
+
+module.exports = {
+  darkMode: ['selector', '.dark'],
+}
 export default config;

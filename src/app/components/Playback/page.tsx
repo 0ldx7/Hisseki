@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
@@ -191,18 +191,18 @@ const Playback: React.FC = () => {
 
     return (
         <div className='flex flex-col min-h-screen relative bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
-            <div className="flex-grow p-6 max-w-xl mx-auto text-black rounded-lg space-y-4">
-                <div className="mt-4 text-right">
-                    {initialPlaybackDone && initialPlaybackTime && <p className="text-sm text-gray-600">{initialPlaybackTime}</p>}
+            <div className='flex-grow p-6 max-w-xl mx-auto text-black rounded-lg space-y-4'>
+                <div className='mt-4 text-right'>
+                    {initialPlaybackDone && initialPlaybackTime && <p className='text-sm text-gray-600'>{initialPlaybackTime}</p>}
                 </div>
                 <div
                     className={`whitespace-pre-wrap p-4 rounded-lg tracking-wide text-lg text-black ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
                     style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
                     {isLoading || !initialPlaybackDone ? 'Loading...' : text}
                 </div>
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
                     <button
-                        className="
+                        className='
                             group
                             py-3
                             px-4
@@ -214,19 +214,19 @@ const Playback: React.FC = () => {
                             bg-neutral-200
                             focus:ring-blue-500 
                             focus:ring-opacity-50
-                            "
+                            '
                         onClick={() => playback(false)}
                         disabled={isReplayDisabled}
                     >
                         <div className='inline-flex items-center'>
-                            <FontAwesomeIcon icon={faReply} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            <FontAwesomeIcon icon={faReply} className='mr-2' style={{ width: '1em', height: '1em' }} />
                             リプレイ
                         </div>
-                        <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500 group-disabled:w-0"></div>
+                        <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500 group-disabled:w-0'></div>
                     </button>
-                    <Link href="/">
+                    <Link href='/'>
                         <button
-                            className="
+                            className='
                                 group
                                 py-3
                                 px-4
@@ -237,17 +237,17 @@ const Playback: React.FC = () => {
                                 m-auto
                                 focus:ring-blue-500 
                                 bg-neutral-200 
-                                "
+                                '
                         >
                             <div className='inline-flex items-center'>
-                                <FontAwesomeIcon icon={faPenToSquare} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                                <FontAwesomeIcon icon={faPenToSquare} className='mr-2' style={{ width: '1em', height: '1em' }} />
                                 新しい筆跡を残す
                             </div>
-                            <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500"></div>
+                            <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500'></div>
                         </button>
                     </Link>
                     <button
-                        className="
+                        className='
                             group
                             py-3
                             px-4
@@ -258,14 +258,14 @@ const Playback: React.FC = () => {
                             m-auto
                             focus:ring-blue-500 
                             bg-neutral-200 
-                            "
+                            '
                         onClick={handleCopyAndSave}
                     >
                         <div className='inline-flex items-center'>
-                            <FontAwesomeIcon icon={faPaste} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                            <FontAwesomeIcon icon={faPaste} className='mr-2' style={{ width: '1em', height: '1em' }} />
                             {copyButtonText}
                         </div>
-                        <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500"></div>
+                        <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500'></div>
                     </button>
                 </div>
             </div>

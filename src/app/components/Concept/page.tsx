@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Header from '@/app/Header';
 import React, { useEffect, useState, useRef } from 'react';
@@ -91,15 +91,15 @@ const Concept: React.FC = () => {
     }, [records]);
 
     return (
-        <div className="h-screen items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
+        <div className='h-screen items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <Header />
-            <div className="mt-14 text-center">
+            <div className='mt-20 text-center'>
                 <p className='pb-4'>Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。</p>
                 <p className='pb-4'>文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。</p>
             </div>
             <div className='mt-10 relative text-center'>
                 <p className='text-center pb-4'>個人的な日記、小説や詩、ポエミーなときの独り言など、</p>
-                <p className='pb-14'>書く物は何でも構いません。</p>
+                <p className='pb-14'>どんな文章でもOKです。</p>
                 <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
                 {/* <p className='tracking-wide'>{text}</p> */}
             </div>

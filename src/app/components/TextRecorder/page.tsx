@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
@@ -55,11 +55,6 @@ const TextRecorder: React.FC = () => {
 
         const newText = event.target.value;
 
-        if (newText.length > 500) {
-            alert("文字数の上限に達しています");
-            return;
-        }
-
         setText(newText);
         const diffs = dmp.diff_main(lastText, newText);
         dmp.diff_cleanupSemantic(diffs);
@@ -98,20 +93,20 @@ const TextRecorder: React.FC = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col min-h-screen text-black bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%">
+        <div className='h-screen flex flex-col min-h-screen text-black bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <div className='flex-grow flex flex-col items-center justify-center'>
                 <textarea
-                    className="w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg"
+                    className='w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg'
                     value={text}
                     onChange={handleInputChange}
                     maxLength={500}
                     disabled={recordingStatus === 'stopped'}
                 />
-                <div className="text-center">
-                    <h4 className="text-md text-gray-600">Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
-                    <div className="flex flex-col sm:flex-row items-center">
+                <div className='text-center'>
+                    <h4 className='text-md text-gray-600'>Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
+                    <div className='flex flex-col sm:flex-row items-center mt-3'>
                         <button
-                            className="
+                            className='
                                 group
                                 py-3
                                 px-4
@@ -123,18 +118,18 @@ const TextRecorder: React.FC = () => {
                                 bg-neutral-700
                                 focus:ring-blue-500 
                                 focus:ring-opacity-50
-                                "
+                                '
                             onClick={() => router.push('/components/Playback')}
                             disabled={recordingStatus !== 'recording'}
                         >
                             <div className='inline-flex items-center'>
-                                <FontAwesomeIcon icon={faPlay} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                                <FontAwesomeIcon icon={faPlay} className='mr-2' style={{ width: '1em', height: '1em' }} />
                                 筆跡を再生する
                             </div>
                             <div className='bg-white h-[2px] w-0 group-hover:w-full transition-all duration-500 group-disabled:w-0'></div>
                         </button>
                         <button
-                            className="
+                            className='
                                 group
                                 py-3
                                 px-4
@@ -145,21 +140,21 @@ const TextRecorder: React.FC = () => {
                                 m-auto
                                 focus:ring-blue-500 
                                 bg-neutral-200 
-                                "
+                                '
                             onClick={resetRecorder}
                         >
                             <div className='inline-flex items-center'>
-                                <FontAwesomeIcon icon={faEraser} className="mr-2" style={{ width: '1em', height: '1em' }} />
+                                <FontAwesomeIcon icon={faEraser} className='mr-2' style={{ width: '1em', height: '1em' }} />
                                 筆跡をリセット
                             </div>
-                            <div className="bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500"></div>
+                            <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500'></div>
                         </button>
                     </div>
-                    <ul className="list-disc list-inside text-left mx-auto max-w-lg tracking-wide">
+                    <ul className='mt-5 list-disc list-inside text-left mx-auto max-w-lg tracking-wide'>
                         <li>別ページでアニメーションが再生されます。</li>
                         <li>文字数制限は500文字です。</li>
                         <li>タイマーが時間切れになると自動的に再生を開始します。</li>
-                        <li>入力した文章は共有リンクから見返すことができます。</li>
+                        <li>再生画面で共有リンクをコピーすると、好きな時にアニメーションが鑑賞できます。</li>
                     </ul>
                 </div>
             </div>
