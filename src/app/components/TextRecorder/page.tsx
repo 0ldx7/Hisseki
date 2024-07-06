@@ -29,7 +29,7 @@ const TextRecorder: React.FC = () => {
                     if (prevTime <= 1) {
                         setRecordingStatus('stopped');
                         clearInterval(timerRef.current!);
-                        location.reload();
+                        router.push('/components/Playback');
                     }
                     return prevTime - 1;
                 });

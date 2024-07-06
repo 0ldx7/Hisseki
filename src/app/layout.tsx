@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ThemeProvider } from 'next-themes';
 import { M_PLUS_1p } from 'next/font/google';
 import { Shippori_Mincho } from 'next/font/google';
 
@@ -17,12 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='ja'>
+    <html lang='ja' suppressContentEditableWarning>
       <body className={`${MPlus1p.className} flex flex-col min-h-screen bg-white text-black`}>
-        <main>
-        {/* p-4 sm:p-6 lg:p-8 */}
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
           {children}
-        </main>
+        </ThemeProvider>
       </body>
     </html>
   );
