@@ -5,7 +5,6 @@ import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaste, faPenToSquare, faReply } from '@fortawesome/free-solid-svg-icons';
 import { logError } from '@/utils/errorHandler';
-import Header from '@/app/Header';
 import Footer from '@/app/Footer';
 import Link from 'next/link';
 
@@ -23,7 +22,7 @@ const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
     const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null);
-    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false);
+    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(true); // 初期値をtrueに変更
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false);
     const [copyButtonText, setCopyButtonText] = useState<string>('リンクをコピー');
@@ -90,6 +89,8 @@ const Playback: React.FC = () => {
                 localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
             }
         }
+
+        setIsReplayDisabled(false); // ローディング完了後にリプレイボタンを有効化
     };
 
     useEffect(() => {

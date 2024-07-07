@@ -4,7 +4,7 @@ import Header from '@/app/Header';
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../../utils/supabaseClient';
 import { diff_match_patch } from 'diff-match-patch';
-import ColorThemeSelector from '../ColorThemeSelector/page';
+// import ColorThemeSelector from '../ColorThemeSelector/page';
 
 type InputRecord = {
     diffs: any;
@@ -94,7 +94,7 @@ const Concept: React.FC = () => {
     return (
         <div className='h-screen items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <Header />
-            <ColorThemeSelector />
+            {/* <ColorThemeSelector /> */}
             <div className='mt-20 text-center'>
                 <p className='pb-4'>Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。</p>
                 <p className='pb-4'>文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。</p>

@@ -96,7 +96,7 @@ const TextRecorder: React.FC = () => {
         <div className='h-screen flex flex-col min-h-screen text-black bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <div className='flex-grow flex flex-col items-center justify-center'>
                 <textarea
-                    className='w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg'
+                    className='w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 bg-white border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg'
                     value={text}
                     onChange={handleInputChange}
                     maxLength={500}
