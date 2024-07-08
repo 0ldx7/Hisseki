@@ -21,8 +21,8 @@ const generateSessionId = () => '_' + Math.random().toString(36).substr(2, 9);
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
-    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null);
-    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(true); // 初期値をtrueに変更
+    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null); //初回再生時刻
+    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(true);  //リプレイボタンの使用可否
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false);
     const [copyButtonText, setCopyButtonText] = useState<string>('リンクをコピー');
@@ -32,8 +32,8 @@ const Playback: React.FC = () => {
     const [shareLink, setShareLink] = useState<string>('');
 
     const fetchRecordsFromLocalStorage = (): InputRecord[] => {
-        const storedData = localStorage.getItem('records');
-        return storedData ? JSON.parse(storedData) : [];
+        const storedData = localStorage.getItem('records'); //ローカルストレージからrecordsを取得
+        return storedData ? JSON.parse(storedData) : []; //JSに変換
     };
 
     const fetchRecordsFromDatabase = async (sessionId: string): Promise<InputRecord[]> => {

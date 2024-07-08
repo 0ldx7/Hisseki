@@ -4,8 +4,8 @@ import { supabase } from '../../../utils/supabaseClient';
 export async function POST(request: Request) {
     try {
         const { sessionId, records } = await request.json();
-        if (!sessionId || !records || !Array.isArray(records)) { 
         //sessionIdまたはrecordsが存在しない場合、またはrecordsが配列でない場合
+        if (!sessionId || !records || !Array.isArray(records)) { 
         //予期できるエラー
             return NextResponse.json({ error: 'sessionId and records are required and records should be an array' }, { status: 400 });
         }

@@ -18,15 +18,15 @@ const TextRecorder: React.FC = () => {
     const [records, setRecords] = useState<InputRecord[]>([]);
     const [timeLeft, setTimeLeft] = useState<number>(15 * 60);
     const [recordingStatus, setRecordingStatus] = useState<'notStarted' | 'recording' | 'stopped'>('notStarted');
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const timerRef = useRef<number | null>(null);
     const dmp = new diff_match_patch();
     const router = useRouter();
 
     useEffect(() => {
-        if (recordingStatus === 'recording') {
-            timerRef.current = setInterval(() => {
-                setTimeLeft((prevTime) => {
-                    if (prevTime <= 1) {
+        if (recordingStatus === 'recording') { //テキスト入力時にタイマーが始動
+            timerRef.current = window.setInterval(() => { //一秒ごとに実行
+                setTimeLeft((prevTime) => { //timeLeftの初期値を渡す
+                    if (prevTime <= 1) { //0になったら停止
                         setRecordingStatus('stopped');
                         clearInterval(timerRef.current!);
                         router.push('/components/Playback');
@@ -35,18 +35,13 @@ const TextRecorder: React.FC = () => {
                 });
             }, 1000);
         }
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-        };
     }, [recordingStatus]);
 
     const saveToLocalStorage = (records: InputRecord[]) => {
         localStorage.setItem('records', JSON.stringify(records));
     };
 
-    const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const handleInputRecords = (event: ChangeEvent<HTMLTextAreaElement>) => {
         if (recordingStatus === 'stopped') return;
 
         if (recordingStatus === 'notStarted') {
@@ -56,10 +51,11 @@ const TextRecorder: React.FC = () => {
         const newText = event.target.value;
 
         setText(newText);
-        const diffs = dmp.diff_main(lastText, newText);
-        dmp.diff_cleanupSemantic(diffs);
-        const patches = dmp.patch_make(lastText, newText, diffs);
+        const diffs = dmp.diff_main(lastText, newText); //入力前と後の差分を計算し、リスト化
+        dmp.diff_cleanupSemantic(diffs); //差分リストの不要部分を削除
+        const patches = dmp.patch_make(lastText, newText, diffs); //テキスト生成のための操作を定義
         const currentTime = Date.now();
+        //配列が空でない場合、最後のtimestampと現在時刻から時間差を求める
         const timeDiff = records.length > 0 ? currentTime - records[records.length - 1].timestamp : 0;
 
         if (records.length < 1500) {
@@ -68,12 +64,13 @@ const TextRecorder: React.FC = () => {
                     ...prevRecords,
                     { diffs: patches, timestamp: currentTime, timeDiff }
                 ];
-                saveToLocalStorage(updatedRecords);
-                return updatedRecords;
+                saveToLocalStorage(updatedRecords); //ローカルストレージに保存
+                return updatedRecords; //setRecordsを改めて返す
             });
         }
 
         if (records.length > 1500) {
+            resetRecorder();
             location.reload();
         }
 
@@ -98,11 +95,12 @@ const TextRecorder: React.FC = () => {
                 <textarea
                     className='w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 bg-white border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg'
                     value={text}
-                    onChange={handleInputChange}
+                    onChange={handleInputRecords}
                     maxLength={500}
                     disabled={recordingStatus === 'stopped'}
                 />
                 <div className='text-center'>
+                    {/* (timeLeft / 60)で分数を求め、(timeLeft % 60)であまりの秒数を求める */}
                     <h4 className='text-md text-gray-600'>Limit: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</h4>
                     <div className='flex flex-col sm:flex-row items-center mt-3'>
                         <button

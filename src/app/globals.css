@@ -1,3 +1,16 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+@keyframes page-scroll-down {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(30px); }
+}
+
+.animate-page-scroll-delay {
+    animation: page-scroll-delay 5s, page-scroll-down 2s cubic-bezier(.6,0,0,.6) 5s infinite;
+}
+
+.bg-main-color {
+    background-color: var(--main-color);
+}

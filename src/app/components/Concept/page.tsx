@@ -105,6 +105,7 @@ const Concept: React.FC = () => {
                 <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
                 {/* <p className='tracking-wide'>{text}</p> */}
             </div>
+            <div className="w-[3px] h-[60px] bg-main-color mx-auto animate-page-scroll-delay animate-page-scroll-down"></div>
         </div>      
     );
 };
