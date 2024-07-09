@@ -98,6 +98,7 @@ const TextRecorder: React.FC = () => {
                     onChange={handleInputRecords}
                     maxLength={500}
                     disabled={recordingStatus === 'stopped'}
+                    placeholder='ここに文章を入力してください'
                 />
                 <div className='text-center'>
                     {/* (timeLeft / 60)で分数を求め、(timeLeft % 60)であまりの秒数を求める */}
