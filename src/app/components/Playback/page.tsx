@@ -31,6 +31,44 @@ const Playback: React.FC = () => {
     const lastUpdateRef = useRef<number>(Date.now());
     const [shareLink, setShareLink] = useState<string>('');
 
+    useEffect(() => {
+        fetchRecords();
+    }, []);
+
+    //ローカルまたはDBからのGETに分岐し、
+    const fetchRecords = async () => {
+        const sessionId = searchParams.get('sessionId'); //クエリからsessionID取得
+
+        let data: InputRecord[] = [];
+        if (sessionId) { //sessionID保持の際はDBからGET
+            data = await fetchRecordsFromDatabase(sessionId);
+        } else { //リンク共有前はクエリないのでローカルから取得
+            data = fetchRecordsFromLocalStorage();
+        }
+
+        setRecords(data); //取得データをstateに反映
+
+        if (sessionId) { //DBからGETした場合
+            setShareLink(`${location.origin}/components/Playback?sessionId=${sessionId}`);
+            const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
+            if (storedTime) {
+                setInitialPlaybackTime(storedTime); //初回再生時刻をローカルに記録
+            }
+        }
+
+        // ローディング終了後の時刻をstateのinitialPlaybackTimeに反映
+        const currentTime = new Date().toLocaleString();
+        if (!initialPlaybackTime) {
+            setInitialPlaybackTime(currentTime);
+            if (sessionId) {
+                localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
+            }
+        }
+        
+        setIsLoading(false);
+        setIsReplayDisabled(false); // ローディング完了後にリプレイボタンを有効化
+    };
+
     const fetchRecordsFromLocalStorage = (): InputRecord[] => {
         const storedData = localStorage.getItem('records'); //ローカルストレージからrecordsを取得
         return storedData ? JSON.parse(storedData) : []; //JSに変換
@@ -61,42 +99,17 @@ const Playback: React.FC = () => {
         }
     };
 
-    const fetchRecords = async () => {
-        const sessionId = searchParams.get('sessionId'); //sessionID取得
-
-        let data: InputRecord[] = [];
-        if (sessionId) { //sessionID保持の際はDBからGET
-            data = await fetchRecordsFromDatabase(sessionId);
-        } else { //sessionIDない場合はローカルストレージから取得
-            data = fetchRecordsFromLocalStorage();
-        }
-
-        setRecords(data); //取得データをstateに反映
-
-        if (sessionId) {
-            setShareLink(`${location.origin}/components/Playback?sessionId=${sessionId}`);
-            const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
-            if (storedTime) {
-                setInitialPlaybackTime(storedTime); //初回再生時刻を記録
-            }
-        }
-
-        // ローディング終了後の時刻をinitialPlaybackTimeとして設定
-        const currentTime = new Date().toLocaleString();
-        if (!initialPlaybackTime) {
-            setInitialPlaybackTime(currentTime);
-            if (sessionId) {
-                localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
-            }
-        }
-        
-        setIsLoading(false);
-        setIsReplayDisabled(false); // ローディング完了後にリプレイボタンを有効化
-    };
-
+    //recordsとisLoadingが変更するたびに実行
     useEffect(() => {
-        fetchRecords();
-    }, []);
+        if (records.length > 0 && !isLoading) { //入力履歴の存在と、ローディング状態でないことを確認
+            playbackRecords(true, () => { //isInitialPlaybackで初回再生であることを確認
+                setInitialPlaybackDone(true); //初回再生であることを示す
+                setTimeout(() => {
+                    playbackRecords(false); //初回再生完了後、isInitialPlaybackをfalseに
+                }, 0); 
+            });
+        }
+    }, [records, isLoading]);
 
     //リプレイ関数
     //isInitialPlayback:初回再生であることを示す
@@ -139,26 +152,24 @@ const Playback: React.FC = () => {
         playNext();
     };
 
-    //recordsとisLoadingが変更するたびに実行
-    useEffect(() => {
-        if (records.length > 0 && !isLoading) { //入力履歴の存在と、ローディング状態でないことを確認
-            playbackRecords(true, () => { //isInitialPlaybackで初回再生であることを確認
-                setInitialPlaybackDone(true); //初回再生であることを示す
-                setTimeout(() => {
-                    playbackRecords(false); //初回再生完了後、isInitialPlaybackをfalseに
-                }, 0); 
-            });
-        }
-    }, [records, isLoading]);
+    //sessionID生成、DB保存、共有リンク生成とコピー
+    const handleCopyAndSave = async () => {
+        const sessionId = generateSessionId(); //ID生成
+        const records = fetchRecordsFromLocalStorage(); //ローカルストレージから差分情報を取得
 
-    const copyToClipboard = async () => {
-        try {
-            await navigator.clipboard.writeText(shareLink);
-            setCopyButtonText('URL is copied!');
-            setTimeout(() => setCopyButtonText('リンクをコピー'), 2000);
-        } catch (error) {
-            logError('リンクのコピーに失敗しました', error);
+        if(shareLink) { //URLにクエリが含まれる場合、共有リンクのコピーだけする
+            copyToClipboard();
+            return;
         }
+
+        if (records.length > 0) { //recordsが存在する場合、DBに保存
+            await saveToDatabase(sessionId, records);
+        }
+        
+        //共有リンクの生成
+        const newShareLink = `${location.origin}/components/Playback?sessionId=${sessionId}`;
+        setShareLink(newShareLink);
+        localStorage.setItem(`initialPlaybackTime-${sessionId}`, new Date().toLocaleString());
     };
 
     const saveToDatabase = async (sessionId: string, records: InputRecord[]) => {
@@ -182,27 +193,22 @@ const Playback: React.FC = () => {
         }
     };
 
-    //sessionID生成、DB保存、共有リンク生成
-    const handleCopyAndSave = async () => {
-        const sessionId = generateSessionId(); //ID生成
-        const records = fetchRecordsFromLocalStorage(); //ローカルストレージから差分情報を取得
-        if (records.length > 0) { //recordsが存在する場合、DBに保存
-            await saveToDatabase(sessionId, records);
-        }
-        
-        //共有リンクの生成
-        const newShareLink = `${location.origin}/components/Playback?sessionId=${sessionId}`;
-        setShareLink(newShareLink);
-        localStorage.setItem(`initialPlaybackTime-${sessionId}`, new Date().toLocaleString());
-    };
-    
     //共有リンクをクリップボードにコピー
     useEffect(() => {
         if (shareLink) {
             copyToClipboard();
         }
     }, [shareLink]);
-    
+
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(shareLink);
+            setCopyButtonText('URL is copied!');
+            setTimeout(() => setCopyButtonText('リンクをコピー'), 2000);
+        } catch (error) {
+            logError('リンクのコピーに失敗しました', error);
+        }
+    };
 
     return (
         <div className='flex flex-col min-h-screen relative bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
