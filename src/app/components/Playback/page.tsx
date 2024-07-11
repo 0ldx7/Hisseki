@@ -152,19 +152,41 @@ const Playback: React.FC = () => {
         playNext();
     };
 
+    //sessionIdがDBに存在するかチェックする
+    const checkSessionIdExists = async (sessionId: string): Promise<boolean> => {
+        try {
+            const response = await fetch(`/api/checkSession?sessionId=${sessionId}`); //sessionIdの存在を確認
+            if (response.ok) {
+                const data = await response.json(); //responseをjsonで取得
+                return data.exists; //存在するかどうかの結果を返す
+            } else { //response失敗時
+                const errorData = await response.json();
+                logError('Failed to check session ID', errorData);
+                return false;
+            }
+        } catch (error) {
+            logError('Error checking session ID:', error);
+            return false;
+        }
+    }
+
     //sessionID生成、DB保存、共有リンク生成とコピー
-    const handleCopyAndSave = async () => {
+    const onClickCopyAndSave = async () => {
         const sessionId = generateSessionId(); //ID生成
         const records = fetchRecordsFromLocalStorage(); //ローカルストレージから差分情報を取得
+        const sessionExists = await checkSessionIdExists(sessionId);
 
         if(shareLink) { //URLにクエリが含まれる場合、共有リンクのコピーだけする
             copyToClipboard();
             return;
         }
-
-        if (records.length > 0) { //recordsが存在する場合、DBに保存
-            await saveToDatabase(sessionId, records);
+        if (!sessionExists) {
+            console.log("session ID is Exists")
+            if (records.length > 0) { //recordsが存在する場合、DBに保存
+                await saveToDatabase(sessionId, records);
+            }
         }
+        
         
         //共有リンクの生成
         const newShareLink = `${location.origin}/components/Playback?sessionId=${sessionId}`;
@@ -172,6 +194,7 @@ const Playback: React.FC = () => {
         localStorage.setItem(`initialPlaybackTime-${sessionId}`, new Date().toLocaleString());
     };
 
+    //DB
     const saveToDatabase = async (sessionId: string, records: InputRecord[]) => {
         try {
             const response = await fetch('/api/saveRecords', {
@@ -280,7 +303,7 @@ const Playback: React.FC = () => {
                             focus:ring-blue-500 
                             bg-neutral-200 
                             '
-                        onClick={handleCopyAndSave}
+                        onClick={onClickCopyAndSave}
                     >
                         <div className='inline-flex items-center'>
                             <FontAwesomeIcon icon={faPaste} className='mr-2' style={{ width: '1em', height: '1em' }} />

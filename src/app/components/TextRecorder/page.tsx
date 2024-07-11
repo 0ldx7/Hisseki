@@ -37,9 +37,6 @@ const TextRecorder: React.FC = () => {
         }
     }, [recordingStatus]);
 
-    const saveToLocalStorage = (records: InputRecord[]) => {
-        localStorage.setItem('records', JSON.stringify(records));
-    };
 
     const handleInputRecords = (event: ChangeEvent<HTMLTextAreaElement>) => {
         if (recordingStatus === 'stopped') return;
@@ -58,17 +55,19 @@ const TextRecorder: React.FC = () => {
         //配列が空でない場合、最後のtimestampと現在時刻から時間差を求める
         const timeDiff = records.length > 0 ? currentTime - records[records.length - 1].timestamp : 0;
 
+        //差分情報をローカルストレージに保存する
         if (records.length < 1500) {
             setRecords((prevRecords) => {
                 const updatedRecords = [
                     ...prevRecords,
                     { diffs: patches, timestamp: currentTime, timeDiff }
                 ];
-                saveToLocalStorage(updatedRecords); //ローカルストレージに保存
+                saveToLocalStorage(updatedRecords); //ローカルストレージへの保存
                 return updatedRecords; //setRecordsを改めて返す
             });
         }
 
+        //差分のrecordsが1500を超えたら自動で初期化、リロード
         if (records.length > 1500) {
             resetRecorder();
             location.reload();
@@ -77,6 +76,11 @@ const TextRecorder: React.FC = () => {
         setLastText(newText);
     };
 
+    const saveToLocalStorage = (records: InputRecord[]) => {
+        localStorage.setItem('records', JSON.stringify(records));
+    };
+
+    //生成された差分情報とカウントダウン、フラグを初期化する
     const resetRecorder = () => {
         setText('');
         setLastText('');
