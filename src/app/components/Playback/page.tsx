@@ -5,8 +5,9 @@ import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaste, faPenToSquare, faReply } from '@fortawesome/free-solid-svg-icons';
 import { logError } from '@/utils/errorHandler';
-import Footer from '@/app/Footer';
 import Link from 'next/link';
+import { supabase } from '../../../utils/supabaseClient';
+import Footer from '@/app/Footer';
 
 type InputRecord = {
     diffs: any;
@@ -76,28 +77,32 @@ const Playback: React.FC = () => {
 
     const fetchRecordsFromDatabase = async (sessionId: string): Promise<InputRecord[]> => {
         try {
-            const response = await fetch(`/api/getRecords?sessionId=${sessionId}`);
-            if (response.ok) {
-                const data: InputRecord[] = await response.json(); //inputRecordsを取得
-                data.forEach((record, index) => { 
-                    //timeDiffが未定義の場合分岐
+            const { data, error } = await supabase
+                .from('text_records')
+                .select('*')
+                .eq('session_id', sessionId); // session_idが一致するレコードを取得
+    
+            if (error) {
+                logError('Error fetching records from database:', error.message);
+                return [];
+            }
+    
+            if (data) {
+                data.forEach((record, index) => {
                     if (record.timeDiff === undefined || record.timeDiff === 0) {
                         data[index].timeDiff = 1000;
                         console.log('TimeDiff is null or undefined');
                     }
                 });
-                return data;
-            //エラー発生時分岐
+                return data as InputRecord[];
             } else {
-                const errorData = await response.json();
-                logError('Failed to fetch records', errorData);
                 return [];
             }
         } catch (error) {
             logError('Error fetching records:', error);
             return [];
         }
-    };
+    };    
 
     //recordsとisLoadingが変更するたびに実行
     useEffect(() => {
@@ -186,7 +191,6 @@ const Playback: React.FC = () => {
                 await saveToDatabase(sessionId, records);
             }
         }
-        
         
         //共有リンクの生成
         const newShareLink = `${location.origin}/components/Playback?sessionId=${sessionId}`;
