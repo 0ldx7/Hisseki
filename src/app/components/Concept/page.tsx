@@ -4,6 +4,8 @@ import Header from '@/app/Header';
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../../utils/supabaseClient';
 import { diff_match_patch } from 'diff-match-patch';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 // import ColorThemeSelector from '../ColorThemeSelector/page';
 
 type InputRecord = {
@@ -104,8 +106,8 @@ const Concept: React.FC = () => {
                 <p className='pb-14'>どんな文章でもOKです。</p>
                 <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
                 {/* <p className='tracking-wide'>{text}</p> */}
+                <FontAwesomeIcon icon={faChevronDown} className='mt-20 animate-fade-down' style={{ width: '2em', height: '2em' }} />
             </div>
-            <div className="w-[3px] h-[60px] bg-main-color mx-auto animate-page-scroll-delay animate-page-scroll-down"></div>
         </div>      
     );
 };

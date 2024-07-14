@@ -102,7 +102,7 @@ const Playback: React.FC = () => {
             logError('Error fetching records:', error);
             return [];
         }
-    };    
+    };
 
     //recordsとisLoadingが変更するたびに実行
     useEffect(() => {
