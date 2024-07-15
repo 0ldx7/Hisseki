@@ -21,9 +21,10 @@ const generateSessionId = () => '_' + Math.random().toString(36)
 
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
+    const [title, setTitle] = useState<string>(''); // タイトルを管理するステートを追加
     const [records, setRecords] = useState<InputRecord[]>([]);
-    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null); //初回再生時刻
-    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(true);  //リプレイボタンの使用可否
+    const [initialPlaybackTime, setInitialPlaybackTime] = useState<string | null>(null); // 初回再生時刻
+    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(true);  // リプレイボタンの使用可否
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [initialPlaybackDone, setInitialPlaybackDone] = useState<boolean>(false);
     const [copyButtonText, setCopyButtonText] = useState<string>('リンクをコピー');
@@ -34,26 +35,31 @@ const Playback: React.FC = () => {
 
     useEffect(() => {
         fetchRecords();
+        const storedTitle = localStorage.getItem('title'); // ローカルストレージからタイトルを取得
+        if (storedTitle) {
+            setTitle(storedTitle); // タイトルをステートに設定
+            document.title = storedTitle; // タイトルをタブ名に設定
+        }
     }, []);
 
-    //ローカルまたはDBからのGETに分岐し、
+    // ローカルまたはDBからのGETに分岐し、データを取得する関数
     const fetchRecords = async () => {
-        const sessionId = searchParams.get('sessionId'); //クエリからsessionID取得
+        const sessionId = searchParams.get('sessionId'); // クエリからsessionID取得
 
         let data: InputRecord[] = [];
-        if (sessionId) { //sessionID保持の際はDBからGET
+        if (sessionId) { // sessionID保持の際はDBからGET
             data = await fetchRecordsFromDatabase(sessionId);
-        } else { //リンク共有前はクエリないのでローカルから取得
+        } else { // リンク共有前はクエリがないのでローカルから取得
             data = fetchRecordsFromLocalStorage();
         }
 
-        setRecords(data); //取得データをstateに反映
+        setRecords(data); // 取得データをstateに反映
 
-        if (sessionId) { //DBからGETした場合
+        if (sessionId) { // DBからGETした場合
             setShareLink(`${location.origin}/components/Playback?sessionId=${sessionId}`);
             const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
             if (storedTime) {
-                setInitialPlaybackTime(storedTime); //初回再生時刻をローカルに記録
+                setInitialPlaybackTime(storedTime); // 初回再生時刻をローカルに記録
             }
         }
 
@@ -65,14 +71,14 @@ const Playback: React.FC = () => {
                 localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
             }
         }
-        
+
         setIsLoading(false);
         setIsReplayDisabled(false); // ローディング完了後にリプレイボタンを有効化
     };
 
     const fetchRecordsFromLocalStorage = (): InputRecord[] => {
-        const storedData = localStorage.getItem('records'); //ローカルストレージからrecordsを取得
-        return storedData ? JSON.parse(storedData) : []; //JSに変換
+        const storedData = localStorage.getItem('records'); // ローカルストレージからrecordsを取得
+        return storedData ? JSON.parse(storedData) : []; // JSに変換
     };
 
     const fetchRecordsFromDatabase = async (sessionId: string): Promise<InputRecord[]> => {
@@ -81,12 +87,12 @@ const Playback: React.FC = () => {
                 .from('text_records')
                 .select('*')
                 .eq('session_id', sessionId); // session_idが一致するレコードを取得
-    
+
             if (error) {
                 logError('Error fetching records from database:', error.message);
                 return [];
             }
-    
+
             if (data) {
                 data.forEach((record, index) => {
                     if (record.timeDiff === undefined || record.timeDiff === 0) {
@@ -104,31 +110,30 @@ const Playback: React.FC = () => {
         }
     };
 
-    //recordsとisLoadingが変更するたびに実行
+    // recordsとisLoadingが変更するたびに実行
     useEffect(() => {
-        if (records.length > 0 && !isLoading) { //入力履歴の存在と、ローディング状態でないことを確認
-            playbackRecords(true, () => { //isInitialPlaybackで初回再生であることを確認
-                setInitialPlaybackDone(true); //初回再生であることを示す
+        if (records.length > 0 && !isLoading) { // 入力履歴の存在と、ローディング状態でないことを確認
+            playbackRecords(true, () => { // isInitialPlaybackで初回再生であることを確認
+                setInitialPlaybackDone(true); // 初回再生であることを示す
                 setTimeout(() => {
-                    playbackRecords(false); //初回再生完了後、isInitialPlaybackをfalseに
-                }, 0); 
+                    playbackRecords(false); // 初回再生完了後、isInitialPlaybackをfalseに
+                }, 0);
             });
         }
     }, [records, isLoading]);
 
-    //リプレイ関数
-    //isInitialPlayback:初回再生であることを示す
-    //onPlaybackComplete:
+    // リプレイ関数
+    // isInitialPlayback: 初回再生であることを示す
+    // onPlaybackComplete: 再生完了時のコールバック
     const playbackRecords = (isInitialPlayback: boolean, onPlaybackComplete?: () => void) => {
-        //再生完了時の初期化処理
         setIsReplayDisabled(true);
         let currentIndex = 0;
         let currentText = '';
 
-        //差分を順次再生する
+        // 差分を順次再生する
         const playNext = () => {
-            if (currentIndex >= records.length) { //再生完了時
-                setIsReplayDisabled(false); //リプレイボタンを押せるように
+            if (currentIndex >= records.length) { // 再生完了時
+                setIsReplayDisabled(false); // リプレイボタンを押せるように
                 if (onPlaybackComplete) onPlaybackComplete();
                 return;
             }
@@ -136,35 +141,35 @@ const Playback: React.FC = () => {
             const record = records[currentIndex++];
             const [newText, results] = dmp.patch_apply(record.diffs, currentText);
 
-            //エラー時に分岐
+            // エラー時に分岐
             if (results.some(result => !result)) {
                 console.error('Patch application failed:', record.diffs, currentText);
             }
 
-            //初回再生はローディングとみなし、stateに反映しない
-            //初回再生でない場合、テキストをstateに反映
-            if (!isInitialPlayback) { 
+            // 初回再生はローディングとみなし、stateに反映しない
+            // 初回再生でない場合、テキストをstateに反映
+            if (!isInitialPlayback) {
                 setText(newText);
             }
-            currentText = newText; //現在のテキストを新しいテキストに更新
-            lastUpdateRef.current = Date.now(); //最後の更新時刻を現在時刻に設定
+            currentText = newText; // 現在のテキストを新しいテキストに更新
+            lastUpdateRef.current = Date.now(); // 最後の更新時刻を現在時刻に設定
 
-            //初回再生時はMIN_INTERVAL、以降はtimeDiffとMIN_INTERVALのうち長いほうを選択
+            // 初回再生時はMIN_INTERVAL、以降はtimeDiffとMIN_INTERVALのうち長いほうを選択
             const nextTimeDiff = isInitialPlayback ? MIN_INTERVAL : Math.max(records[currentIndex]?.timeDiff ?? MIN_INTERVAL);
-            setTimeout(playNext, nextTimeDiff); //差分時間を考慮し次のテキストを再生
+            setTimeout(playNext, nextTimeDiff); // 差分時間を考慮し次のテキストを再生
         };
 
         playNext();
     };
 
-    //sessionIdがDBに存在するかチェックする
+    // sessionIdがDBに存在するかチェックする
     const checkSessionIdExists = async (sessionId: string): Promise<boolean> => {
         try {
-            const response = await fetch(`/api/checkSession?sessionId=${sessionId}`); //sessionIdの存在を確認
+            const response = await fetch(`/api/checkSession?sessionId=${sessionId}`); // sessionIdの存在を確認
             if (response.ok) {
-                const data = await response.json(); //responseをjsonで取得
-                return data.exists; //存在するかどうかの結果を返す
-            } else { //response失敗時
+                const data = await response.json(); // responseをjsonで取得
+                return data.exists; // 存在するかどうかの結果を返す
+            } else { // response失敗時
                 const errorData = await response.json();
                 logError('Failed to check session ID', errorData);
                 return false;
@@ -175,30 +180,30 @@ const Playback: React.FC = () => {
         }
     }
 
-    //sessionID生成、DB保存、共有リンク生成とコピー
+    // sessionID生成、DB保存、共有リンク生成とコピー
     const onClickCopyAndSave = async () => {
-        const sessionId = generateSessionId(); //ID生成
-        const records = fetchRecordsFromLocalStorage(); //ローカルストレージから差分情報を取得
+        const sessionId = generateSessionId(); // ID生成
+        const records = fetchRecordsFromLocalStorage(); // ローカルストレージから差分情報を取得
         const sessionExists = await checkSessionIdExists(sessionId);
 
-        if(shareLink) { //URLにクエリが含まれる場合、共有リンクのコピーだけする
+        if(shareLink) { // URLにクエリが含まれる場合、共有リンクのコピーだけする
             copyToClipboard();
             return;
         }
         if (!sessionExists) {
             console.log("session ID is Exists")
-            if (records.length > 0) { //recordsが存在する場合、DBに保存
+            if (records.length > 0) { // recordsが存在する場合、DBに保存
                 await saveToDatabase(sessionId, records);
             }
         }
-        
-        //共有リンクの生成
+
+        // 共有リンクの生成
         const newShareLink = `${location.origin}/components/Playback?sessionId=${sessionId}`;
         setShareLink(newShareLink);
         localStorage.setItem(`initialPlaybackTime-${sessionId}`, new Date().toLocaleString());
     };
 
-    //DB
+    // DBにデータを保存する関数
     const saveToDatabase = async (sessionId: string, records: InputRecord[]) => {
         try {
             const response = await fetch('/api/saveRecords', {
@@ -220,7 +225,7 @@ const Playback: React.FC = () => {
         }
     };
 
-    //共有リンクをクリップボードにコピー
+    // 共有リンクをクリップボードにコピーする関数
     useEffect(() => {
         if (shareLink) {
             copyToClipboard();
@@ -240,7 +245,9 @@ const Playback: React.FC = () => {
     return (
         <div className='flex flex-col min-h-screen relative bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <div className='flex-grow p-6 max-w-xl mx-auto text-black rounded-lg space-y-4'>
-                <div className='mt-4 text-right'>
+                <div className='flex justify-between items-center'>
+                    <div className='text-left text-md'>{title}</div> {/* タイトルを表示するための要素を追加 */}
+                    {initialPlaybackDone && initialPlaybackTime && <p className='text-sm text-gray-600'>{title}</p>}
                     {initialPlaybackDone && initialPlaybackTime && <p className='text-sm text-gray-600'>{initialPlaybackTime}</p>}
                 </div>
                 <div
