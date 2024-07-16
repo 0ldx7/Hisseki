@@ -3,7 +3,6 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: Request) {
     const url = new URL(request.url);
-    //sessionIDをURLから取得
     const sessionId = url.searchParams.get('sessionId');
 
     if (!sessionId) {
@@ -17,10 +16,10 @@ export async function GET(request: Request) {
             .eq('session_id', sessionId);
 
         if (error) {
+            console.error('Supabase error:', error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        //mappedDataに取得したRecordsを代入
         const mappedData = data.map(record => ({
             ...record,
             timeDiff: record.time_diff || 1000
@@ -29,6 +28,7 @@ export async function GET(request: Request) {
         return NextResponse.json(mappedData, { status: 200 });
 
     } catch (err) {
+        console.error('Unexpected error:', err);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
