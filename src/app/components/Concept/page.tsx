@@ -99,7 +99,7 @@ const Concept: React.FC = () => {
             {/* <ColorThemeSelector /> */}
             <div className='mt-20 text-center'>
                 <p className='pb-4'>Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。</p>
-                <p className='pb-4'>文章作成のプロセスをトレースして視覚化することで、あなたの思考の流れやアイデアの変遷を鮮明に記録します。</p>
+                <p className='pb-4'>文章作成のプロセスをトレースすることで、あなたの思考の流れやアイデアの変遷を目に見える形で表現します。</p>
             </div>
             <div className='mt-10 relative text-center'>
                 <p className='text-center pb-4'>個人的な日記、小説や詩、ポエミーなときの独り言など、</p>

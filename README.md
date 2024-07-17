@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## ■ サービス名
 
-## Getting Started
+[Hisseki]()
 
-First, run the development server:
+## サービス概要
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+「Hisseki」は、ユーザーが入力したテキストの編集履歴を記録し、再生することができるアプリです。
+文章作成のプロセスをトレースすることで、ユーザーの言葉以前の思考の流れやアイデアの変遷を目に見える形で表現します。
+入力したテキストはアプリ内のリンク共有機能で保存ができるので、任意のタイミングで後から見返すことも可能です。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## このサービスへの思い・作りたい理由
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+人と人による意思疎通の手段は、対話によるコミュニケーションとテキストによるコミュニケーションの二つに大別できます。
+前者には表情・声音・抑揚のような、言葉にならない側面が含まれており、
+後者には言葉の完成形が残るのみで、文面以外の情報を読み取ることはできません。
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+本アプリは、こうしたコミュニケーション手段の中間に位置することを目指したものです。
 
-## Learn More
+## ユーザー層について
 
-To learn more about Next.js, take a look at the following resources:
+日記を残す習慣がある人
+小説や詩といった文筆を嗜む人
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## リンク共有機能
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+アプリで入力したテキストは、リンク共有ボタンを押下することでデータベースに保存されます。
+利用に際してユーザー登録等は一切必要なく、気軽に使用することが可能です。
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 機能候補
