@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { M_PLUS_1p } from 'next/font/google';
-import { Shippori_Mincho } from 'next/font/google';
 
 const MPlus1p = M_PLUS_1p({ subsets: ['latin'], weight: ['300'], display: 'swap' });
-export const ShipporiMincho = Shippori_Mincho({ subsets: ['latin'], weight: ['400'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'Hisseki',
