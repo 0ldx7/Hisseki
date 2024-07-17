@@ -103,7 +103,7 @@ const Concept: React.FC = () => {
             </div>
             <div className='mt-10 relative text-center'>
                 <p className='text-center pb-4'>個人的な日記、小説や詩、ポエミーなときの独り言など、</p>
-                <p className='pb-14'>どんな文章でもOKです。</p>
+                <p className='pb-14'>入力する文章はなんでも構いません。</p>
                 <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
                 {/* <p className='tracking-wide'>{text}</p> */}
                 <FontAwesomeIcon icon={faChevronDown} className='mt-20 animate-fade-down' style={{ width: '2em', height: '2em' }} />
