@@ -45,11 +45,11 @@
 
 1.textareaに任意の文章を入力し、「筆跡を再生する」ボタンを押下。
 
-<img src="public/Recorder.png" width="50%">
+<img src="public/Recorder.png" width="100%">
 
 2.再生画面でテキストを鑑賞する。
 
-<img src="public/Playback.png" width="50%">
+<video autoPlay src="public/PlaybackDemo.mp4" width="100%">
 
 「リプレイ」ボタンで再度テキストを再生、<br>
 「新しい筆跡を残す」ボタンでテキスト入力画面に遷移、<br>
@@ -80,4 +80,4 @@
 | バックエンド   | API route (Next.js)     |
 | インフラ       | Vercel             |
 | DB             | supabase                   |
-| API            | google/diff-match-patch  |
+| ライブラリ            | google/diff-match-patch  |
