@@ -49,9 +49,7 @@
 
 2.再生画面でテキストを鑑賞する。
 
-<video autoPlay width="100%">
-    <source src="public/PlaybackDemo.mp4" type="video/mp4">
-</video>
+<img src="public/Playback.png" width="100%">
 
 「リプレイ」ボタンで再度テキストを再生、<br>
 「新しい筆跡を残す」ボタンでテキスト入力画面に遷移、<br>
