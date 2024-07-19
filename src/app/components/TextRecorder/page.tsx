@@ -102,7 +102,7 @@ const TextRecorder: React.FC = () => {
         <div className='h-screen flex flex-col min-h-screen text-black bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <div className='flex-grow flex flex-col items-center justify-center'>
                 <textarea
-                    className='w-full max-w-4xl h-48 p-4 mb-4 text-sm border-2 bg-white border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg'
+                    className='w-full max-w-4xl h-48 p-4 mb-4 text-base leading-normal border-2 bg-white border-gray-300 focus:ring-2 focus:ring-gray-500 rounded-lg'
                     value={text}
                     onChange={handleInputRecords}
                     maxLength={500}
@@ -122,7 +122,7 @@ const TextRecorder: React.FC = () => {
                                 mb-4 
                                 m-auto 
                                 text-white
-                                font-light
+                                font-medium
                                 bg-neutral-700
                                 focus:ring-blue-500 
                                 focus:ring-opacity-50
@@ -143,7 +143,7 @@ const TextRecorder: React.FC = () => {
                                 px-4
                                 mt-2
                                 mb-4 
-                                font-light
+                                font-medium
                                 text-neutral-700
                                 m-auto
                                 focus:ring-blue-500 
@@ -158,7 +158,7 @@ const TextRecorder: React.FC = () => {
                             <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500'></div>
                         </button>
                     </div>
-                    <ul className='mt-5 list-disc list-inside text-left mx-auto max-w-lg tracking-wide'>
+                    <ul className='mt-5 list-disc list-inside text-left text-base mx-auto max-w-lg tracking-wider leading-normal'>
                         <li>別ページでアニメーションが再生されます。</li>
                         <li>文字数制限は500文字です。</li>
                         <li>タイマーが時間切れになると自動的に再生を開始します。</li>

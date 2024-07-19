@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -209,7 +209,7 @@ const Playback: React.FC = () => {
                     {initialPlaybackDone && initialPlaybackTime && <p className='text-sm text-gray-600'>{initialPlaybackTime}</p>}
                 </div>
                 <div
-                    className={`whitespace-pre-wrap p-4 rounded-lg tracking-wide text-lg text-black ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
+                    className={`whitespace-pre-wrap p-4 rounded-lg tracking-wider text-xl text-gray-900 ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
                     style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
                     {isLoading || !initialPlaybackDone ? 'Loading...' : text}
                 </div>
