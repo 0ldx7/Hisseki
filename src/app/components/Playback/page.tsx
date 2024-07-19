@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,7 +16,7 @@ type InputRecord = {
 
 const MIN_INTERVAL = 100;
 
-const generateSessionId = () => '_' + Math.random().toString(36)
+const generateSessionId = () => '_' + Math.random().toString(36);
 
 const Playback: React.FC = () => {
     const [text, setText] = useState<string>('');
@@ -35,7 +35,7 @@ const Playback: React.FC = () => {
         fetchRecords();
     }, []);
 
-    //ローカルまたはDBからのGETに分岐し、
+    //ローカルまたはDBからのGETに分岐する
     const fetchRecords = async () => {
         const sessionId = searchParams.get('sessionId'); //クエリからsessionID取得
 
@@ -48,30 +48,23 @@ const Playback: React.FC = () => {
 
         setRecords(data); //取得データをstateに反映
 
-        if (sessionId) { //DBからGETした場合
-            setShareLink(`${location.origin}/components/Playback?sessionId=${sessionId}`);
-            const storedTime = localStorage.getItem(`initialPlaybackTime-${sessionId}`);
-            if (storedTime) {
-                setInitialPlaybackTime(storedTime); //初回再生時刻をローカルに記録
-            }
+        if (data.length > 0) { //取得したdataにrecordsが存在する場合
+            const lastRecord = data[data.length - 1]; // 最終レコードを取得
+            const lastTimestamp = new Date(lastRecord.timestamp).toLocaleString(); // 最終レコードのタイムスタンプを時刻に変換
+            setInitialPlaybackTime(lastTimestamp); // initialPlaybackTimeに設定
         }
 
-        // ローディング終了後の時刻をstateのinitialPlaybackTimeに反映
-        const currentTime = new Date().toLocaleString();
-        if (!initialPlaybackTime) {
-            setInitialPlaybackTime(currentTime);
-            if (sessionId) {
-                localStorage.setItem(`initialPlaybackTime-${sessionId}`, currentTime);
-            }
+        if (sessionId) { //DBからGETした場合
+            setShareLink(`${location.origin}/components/Playback?sessionId=${sessionId}`); //共有リンク設定
         }
-        
+
         setIsLoading(false);
         setIsReplayDisabled(false); // ローディング完了後にリプレイボタンを有効化
     };
 
     const fetchRecordsFromLocalStorage = (): InputRecord[] => {
-        const storedData = localStorage.getItem('records'); //ローカルストレージからrecordsを取得
-        return storedData ? JSON.parse(storedData) : []; //JSに変換
+        const response = localStorage.getItem('records'); //ローカルストレージからrecordsを取得
+        return response ? JSON.parse(response) : []; //JSに変換
     };
 
     const fetchRecordsFromDatabase = async (sessionId: string): Promise<InputRecord[]> => {
@@ -79,7 +72,7 @@ const Playback: React.FC = () => {
             const response = await fetch(`/api/getRecords?sessionId=${sessionId}`);
             if (response.ok) {
                 const data: InputRecord[] = await response.json(); //inputRecordsを取得
-                data.forEach((record, index) => { 
+                data.forEach((record, index) => {
                     //timeDiffが未定義の場合分岐
                     if (record.timeDiff === undefined || record.timeDiff === 0) {
                         data[index].timeDiff = 1000;
@@ -87,7 +80,7 @@ const Playback: React.FC = () => {
                     }
                 });
                 return data;
-            //エラー発生時分岐
+                //エラー発生時分岐
             } else {
                 const errorData = await response.json();
                 logError('Failed to fetch records', errorData);
@@ -106,14 +99,13 @@ const Playback: React.FC = () => {
                 setInitialPlaybackDone(true); //初回再生であることを示す
                 setTimeout(() => {
                     playbackRecords(false); //初回再生完了後、isInitialPlaybackをfalseに
-                }, 0); 
+                }, 0);
             });
         }
     }, [records, isLoading]);
 
     //リプレイ関数
     //isInitialPlayback:初回再生であることを示す
-    //onPlaybackComplete:
     const playbackRecords = (isInitialPlayback: boolean, onPlaybackComplete?: () => void) => {
         //再生完了時の初期化処理
         setIsReplayDisabled(true);
@@ -138,7 +130,7 @@ const Playback: React.FC = () => {
 
             //初回再生はローディングとみなし、stateに反映しない
             //初回再生でない場合、テキストをstateに反映
-            if (!isInitialPlayback) { 
+            if (!isInitialPlayback) {
                 setText(newText);
             }
             currentText = newText; //現在のテキストを新しいテキストに更新
@@ -157,7 +149,7 @@ const Playback: React.FC = () => {
         const sessionId = generateSessionId(); //ID生成
         const records = fetchRecordsFromLocalStorage(); //ローカルストレージから差分情報を取得
 
-        if(shareLink) { //URLにクエリが含まれる場合、共有リンクのコピーだけする
+        if (shareLink) { //URLにクエリが含まれる場合、共有リンクのコピーだけする
             copyToClipboard();
             return;
         }
@@ -165,7 +157,7 @@ const Playback: React.FC = () => {
         if (records.length > 0) { //recordsが存在する場合、DBに保存
             await saveToDatabase(sessionId, records);
         }
-        
+
         //共有リンクの生成
         const newShareLink = `${location.origin}/components/Playback?sessionId=${sessionId}`;
         setShareLink(newShareLink);
@@ -223,18 +215,7 @@ const Playback: React.FC = () => {
                 </div>
                 <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
                     <button
-                        className='
-                            group
-                            py-3
-                            px-4
-                            mt-2
-                            mb-4 
-                            m-auto 
-                            text-neutral-700
-                            font-light
-                            bg-neutral-200
-                            focus:ring-blue-500 
-                            focus:ring-opacity-50
+                        className='group py-3 px-4 mt-2 mb-4 m-auto text-neutral-700 font-light bg-neutral-200 focus:ring-blue-500 focus:ring-opacity-50
                             '
                         onClick={() => playbackRecords(false)}
                         disabled={isReplayDisabled}
@@ -246,20 +227,7 @@ const Playback: React.FC = () => {
                         <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500 group-disabled:w-0'></div>
                     </button>
                     <Link href='/'>
-                        <button
-                            className='
-                                group
-                                py-3
-                                px-4
-                                mt-2
-                                mb-4 
-                                font-light
-                                text-neutral-700
-                                m-auto
-                                focus:ring-blue-500 
-                                bg-neutral-200 
-                                '
-                        >
+                        <button className='group py-3 px-4 mt-2 mb-4 font-light text-neutral-700 m-auto focus:ring-blue-500 bg-neutral-200'>
                             <div className='inline-flex items-center'>
                                 <FontAwesomeIcon icon={faPenToSquare} className='mr-2' style={{ width: '1em', height: '1em' }} />
                                 新しい筆跡を残す
@@ -267,19 +235,8 @@ const Playback: React.FC = () => {
                             <div className='bg-neutral-600 h-[2px] w-0 group-hover:w-full transition-all duration-500'></div>
                         </button>
                     </Link>
-                    <button
-                        className='
-                            group
-                            py-3
-                            px-4
-                            mt-2
-                            mb-4 
-                            font-light
-                            text-neutral-700
-                            m-auto
-                            focus:ring-blue-500 
-                            bg-neutral-200 
-                            '
+                    <button 
+                        className='group py-3 px-4 mt-2 mb-4 font-light text-neutral-700 m-auto focus:ring-blue-500 bg-neutral-200'
                         onClick={handleCopyAndSave}
                     >
                         <div className='inline-flex items-center'>
