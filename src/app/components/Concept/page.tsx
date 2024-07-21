@@ -1,12 +1,10 @@
-'use client';
-
+"use client";
 import Header from '@/app/Header';
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../../utils/supabaseClient';
 import { diff_match_patch } from 'diff-match-patch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-// import ColorThemeSelector from '../ColorThemeSelector/page';
 
 type InputRecord = {
     diffs: any;
@@ -17,11 +15,9 @@ type InputRecord = {
 const MIN_INTERVAL = 100;
 const DEMO_SESSION_ID = '_n5hulccn0'; // デモ用のセッションIDを指定
 
-
 const Concept: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [records, setRecords] = useState<InputRecord[]>([]);
-    const [isReplayDisabled, setIsReplayDisabled] = useState<boolean>(false);
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now());
 
@@ -51,16 +47,10 @@ const Concept: React.FC = () => {
 
     // 文章再生ロジック
     const playback = () => {
-        setIsReplayDisabled(true);
         let currentIndex = 0;
         let currentText = '';
 
         const playNext = () => {
-            if (currentIndex >= records.length) {
-                setIsReplayDisabled(false);
-                return;
-            }
-
             const record = records[currentIndex++];
             const [newText, results] = dmp.patch_apply(record.diffs, currentText);
 
@@ -78,14 +68,6 @@ const Concept: React.FC = () => {
 
         playNext();
     };
-
-    useEffect(() => {
-        const loadDemoRecords = async () => {
-            const demoRecords = await fetchDemoRecords();
-            setRecords(demoRecords);
-        };
-        loadDemoRecords();
-    }, []);
 
     useEffect(() => {
         if (records.length > 0) {
@@ -107,7 +89,7 @@ const Concept: React.FC = () => {
                 {/* <p className='tracking-wide'>{text}</p> */}
                 <FontAwesomeIcon icon={faChevronDown} className='mt-20 animate-fade-down' style={{ width: '2em', height: '2em' }} />
             </div>
-        </div>      
+        </div>
     );
 };
 
