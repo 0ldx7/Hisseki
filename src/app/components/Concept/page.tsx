@@ -87,7 +87,9 @@ const Concept: React.FC = () => {
                 <p className='pb-14'>入力する文章はなんでも構いません。</p>
                 <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
                 {/* <p className='tracking-wide'>{text}</p> */}
-                <FontAwesomeIcon icon={faChevronDown} className='mt-20 animate-fade-down' style={{ width: '2em', height: '2em' }} />
+                <div className='animate-initial-invisible'>
+                    <FontAwesomeIcon icon={faChevronDown} className='mt-20 animate-fade-down' style={{ width: '2em', height: '2em' }} />
+                </div>
             </div>
         </div>
     );

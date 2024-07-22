@@ -9,11 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       animation: {
-        'fade-down': 'fadeDown 1.5s infinite',
+        'fade-down': 'fadeDown 2s infinite',
+        'initial-invisible': 'initialInvisible 1.5s forwards'
       },
       keyframes: {
         fadeDown: {
-          '0%, ': {
+          '0%': {
             transform: 'translateY(0)' ,
             opacity: '0',
           },
@@ -22,6 +23,11 @@ const config: Config = {
           },
           '100%': { transform: 'translateY(20px)' },
         },
+        initialInvisible: {
+          '0%': { opacity: '0' },
+          '49%': { opacity: '0' },
+          '100%': { opacity: '100' }
+        }
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
