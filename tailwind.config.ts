@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       animation: {
         'fade-down': 'fadeDown 2s infinite',
-        'initial-invisible': 'initialInvisible 1.5s forwards'
+        'initial-invisible': 'initialInvisible 1.8s forwards'
       },
       keyframes: {
         fadeDown: {
@@ -18,7 +18,7 @@ const config: Config = {
             transform: 'translateY(0)' ,
             opacity: '0',
           },
-          '20%': {
+          '30%': {
             opacity: '100',
           },
           '100%': { transform: 'translateY(20px)' },
