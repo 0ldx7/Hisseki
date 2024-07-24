@@ -145,9 +145,11 @@ const Playback: React.FC = () => {
     };
 
     //sessionID生成、DB保存、共有リンク生成とコピー
-    const handleCopyAndSave = async () => {
+    const handleClickCopyAndSave = async () => {
         const sessionId = generateSessionId(); //ID生成
         const records = fetchRecordsFromLocalStorage(); //ローカルストレージから差分情報を取得
+
+        setCopyButtonText('Now Loading...');
 
         if (shareLink) { //URLにクエリが含まれる場合、共有リンクのコピーだけする
             copyToClipboard();
@@ -237,7 +239,7 @@ const Playback: React.FC = () => {
                     </Link>
                     <button 
                         className='group py-3 px-4 mt-2 mb-4 font-light text-neutral-700 m-auto focus:ring-blue-500 bg-neutral-200'
-                        onClick={handleCopyAndSave}
+                        onClick={handleClickCopyAndSave}
                     >
                         <div className='inline-flex items-center'>
                             <FontAwesomeIcon icon={faPaste} className='mr-2' style={{ width: '1em', height: '1em' }} />
