@@ -29,13 +29,13 @@ const TextRecorder: React.FC = () => {
                     if (prevTime <= 1) { //0になったら停止
                         setRecordingStatus('stopped');
                         clearInterval(timerRef.current!);
-                        router.push('/components/Playback');
+                        router.push('/components/PlaybackWrapper');
                     }
                     return prevTime - 1;
                 });
             }, 1000);
         }
-    }, [recordingStatus]);
+    }, [recordingStatus, router]);
 
 
     const handleInputRecords = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -127,7 +127,7 @@ const TextRecorder: React.FC = () => {
                                 focus:ring-blue-500 
                                 focus:ring-opacity-50
                                 '
-                            onClick={() => router.push('/components/Playback')}
+                            onClick={() => router.push('/components/PlaybackWrapper')}
                             disabled={recordingStatus !== 'recording'}
                         >
                             <div className='inline-flex items-center'>
