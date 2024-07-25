@@ -4,7 +4,7 @@ import Playback from '../Concept/Playback/page';
 
 const PlaybackWrapper: React.FC = () => {
     return (
-        <Suspense>
+        <Suspense fallback={<div>Loading...</div>}>
             <Playback />
         </Suspense>
     );
