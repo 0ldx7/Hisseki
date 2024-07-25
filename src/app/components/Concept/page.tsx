@@ -13,7 +13,9 @@ type InputRecord = {
 };
 
 const MIN_INTERVAL = 100;
-const DEMO_SESSION_ID = '_n5hulccn0'; // デモ用のセッションIDを指定
+
+// 一つのセッションIDを指定
+const DEMO_SESSION_ID = '_0.ca4919abr1a';
 
 const Concept: React.FC = () => {
     const [text, setText] = useState<string>('');
@@ -21,7 +23,7 @@ const Concept: React.FC = () => {
     const dmp = new diff_match_patch();
     const lastUpdateRef = useRef<number>(Date.now());
 
-    // Supabaseからデモ用のデータを取得
+    // Supabaseからデモデータを取得
     const fetchDemoRecords = async () => {
         try {
             const { data, error } = await supabase
@@ -30,15 +32,19 @@ const Concept: React.FC = () => {
                 .eq('session_id', DEMO_SESSION_ID);
 
             if (error) {
-                console.error('Error fetching records:', error.message);
+                console.error('Error fetching records for session ID:', DEMO_SESSION_ID, error.message);
                 return [];
             }
 
-            return data.map(record => ({
+            const sessionRecords = data.map(record => ({
                 diffs: record.diffs,
                 timestamp: record.timestamp,
                 timeDiff: record.time_diff || 1000
             }));
+
+            // timestampでソート
+            sessionRecords.sort((a, b) => a.timestamp - b.timestamp);
+            return sessionRecords;
         } catch (error) {
             console.error('Error fetching records:', error);
             return [];
@@ -51,6 +57,10 @@ const Concept: React.FC = () => {
         let currentText = '';
 
         const playNext = () => {
+            if (currentIndex >= records.length) {
+                return; // すべてのレコードの再生が完了
+            }
+
             const record = records[currentIndex++];
             const [newText, results] = dmp.patch_apply(record.diffs, currentText);
 
@@ -58,10 +68,12 @@ const Concept: React.FC = () => {
                 console.error('Patch application failed:', record.diffs, currentText);
             }
 
+            // テキストの状態を更新
             setText(newText);
             currentText = newText;
             lastUpdateRef.current = Date.now();
 
+            // 次の再生タイミングを設定
             const nextTimeDiff = Math.max(records[currentIndex]?.timeDiff ?? 1000, MIN_INTERVAL);
             setTimeout(playNext, nextTimeDiff);
         };
@@ -70,25 +82,37 @@ const Concept: React.FC = () => {
     };
 
     useEffect(() => {
+        const loadRecords = async () => {
+            // データ取得後に状態に設定
+            const fetchedRecords = await fetchDemoRecords();
+            setRecords(fetchedRecords);
+        };
+
+        loadRecords();
+    }, []);
+
+    useEffect(() => {
         if (records.length > 0) {
             playback();
         }
     }, [records]);
 
     return (
-        <div className='h-screen items-center mt-40 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
+        <div className='h-screen items-center mt-24 leading-loose bg-gradient-to-t from-transparent from-0% via-neutral-100 via-50%'>
             <Header />
             <div className='mt-20 text-center'>
                 <p className='pb-4'>Hissekiは、あなたが入力したテキストの編集履歴をリアルタイムで記録し、再生することができるアプリです。</p>
                 <p className='pb-4'>文章作成のプロセスをトレースすることで、あなたの思考の流れやアイデアの変遷を目に見える形で表現します。</p>
             </div>
-            <div className='mt-10 relative text-center'>
+            <div className='mt-10 text-center'>
                 <p className='text-center pb-4'>個人的な日記、小説や詩、ポエミーなときの独り言など、</p>
                 <p className='pb-14'>入力する文章はなんでも構いません。</p>
                 <p className='tracking-wide'>あなたの言葉が生まれる瞬間を、少し振り返ってみませんか。</p>
-                {/* <p className='tracking-wide'>{text}</p> */}
-                <div className='animate-initial-invisible'>
-                    <FontAwesomeIcon icon={faChevronDown} className='mt-20 animate-fade-down' style={{ width: '2em', height: '2em' }} />
+                {/* <div className='animate-initial-invisible'>
+                    <FontAwesomeIcon icon={faChevronDown} className='mt-10 animate-fade-down' style={{ width: '2em', height: '2em' }} />
+                </div> */}
+                <div className="max-h-80 ml-10">
+                    <p className='tracking-wide text-left text-5xl font-serif -z-10 [writing-mode:vertical-rl]'>{text}</p>
                 </div>
             </div>
         </div>

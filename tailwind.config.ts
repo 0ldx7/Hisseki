@@ -8,11 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      //Conceptのアイコンアニメーション
       animation: {
         'fade-down': 'fadeDown 2s infinite',
         'initial-invisible': 'initialInvisible 1.8s forwards'
       },
       keyframes: {
+        //Conceptのロード直後のちらつきを防止
         fadeDown: {
           '0%': {
             transform: 'translateY(0)' ,
