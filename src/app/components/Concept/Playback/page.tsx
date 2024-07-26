@@ -211,8 +211,8 @@ const Playback: React.FC = () => {
                     {initialPlaybackDone && initialPlaybackTime && <p className='text-sm text-gray-600'>{initialPlaybackTime}</p>}
                 </div>
                 <div
-                    className={`whitespace-pre-wrap p-4 rounded-lg tracking-wider text-xl text-gray-900 ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
-                    style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1 }}>
+                    className={`whitespace-pre-wrap p-4 rounded-lg tracking-wide text-2xl text-gray-900 ${isLoading || !initialPlaybackDone ? 'animate-pulse' : ''}`}
+                    style={isLoading || !initialPlaybackDone ? { opacity: 0 } : { opacity: 1, fontFamily: 'serif' }}>
                     {isLoading || !initialPlaybackDone ? 'Loading...' : text}
                 </div>
                 <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
