@@ -1,6 +1,6 @@
-'use client';
+"use client";
 import React, { Suspense } from 'react';
-import Playback from '../Concept/Playback/page';
+import Playback from '../Playback/page';
 
 const PlaybackWrapper: React.FC = () => {
     return (
