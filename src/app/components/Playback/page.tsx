@@ -33,6 +33,7 @@ const Playback: React.FC = () => {
 
     useEffect(() => {
         fetchRecords();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     //ローカルまたはDBからのGETに分岐する
@@ -102,6 +103,7 @@ const Playback: React.FC = () => {
                 }, 0);
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [records, isLoading]);
 
     //リプレイ関数
@@ -192,6 +194,7 @@ const Playback: React.FC = () => {
         if (shareLink) {
             copyToClipboard();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [shareLink]);
 
     const copyToClipboard = async () => {
